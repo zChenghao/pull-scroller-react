@@ -1,7 +1,7 @@
 {
   "name": "pull-scroller-react",
   "sideEffects": false,
-  "version": "1.2.10",
+  "version": "1.2.12",
   "description": "A scroll component based on React and Better-Scroll for mobile web app",
   "main": "dist/index.js",
   "scripts": {
@@ -30,5 +30,9 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zChenghao/pull-scroller-react"
+  }
 }

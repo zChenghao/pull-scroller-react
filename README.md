@@ -1,12 +1,14 @@
 # pull-scroller-react
 
-A scroll component based on React and Better-Scroll for mobile web app
+A scroll component based on React and Better-Scroll for mobile web app  
+
+[Github](https://github.com/zChenghao/pull-scroller-react)
 
 ## Installation
 
-npm install pull-scroller-react
+npm install pull-scroller-react  
 
-## `or`
+or  
 
 yarn add pull-scroller-react
 
@@ -67,7 +69,7 @@ function App() {
     listCount.current = list.length;
   }, [list]);
 
-  // 模拟接口请求
+  // Mock request
   const getData = async (time) => {
     const res = await timeout(time);
     console.log(`getData ${res}`);

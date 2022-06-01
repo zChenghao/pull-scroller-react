@@ -9,7 +9,7 @@ BScroll.use(Pullup);
 
 export default function useScrollController(props: ScrollerProps, el: HTMLElement | string) {
   const [bScroller, setBScroller] = useState<ScrollConstructor>();
-  const { isPreventDefault, enablePullDown, enablePullUp } = props;
+  const { isPreventDefault, enablePullDown, enablePullUp, pullDownConfig, pullUpConfig } = props;
 
   // 初始化滚动方法
   const initScroller = useCallback(
@@ -23,19 +23,19 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
           preventDefault: isPreventDefault ?? true, // 是否阻止浏览器默认行为
           // probeType: 3
           // 下拉刷新配置
-          pullDownRefresh: {
+          pullDownRefresh: pullDownConfig || {
             threshold: 100,
             stop: 50
           },
           // 上拉加载
           // pullUpLoad: true
-          pullUpLoad: {
+          pullUpLoad: pullUpConfig || {
             threshold: 0
           }
         })
       );
     },
-    [isPreventDefault]
+    [isPreventDefault, , pullDownConfig, pullUpConfig]
   );
 
   // 初始化滚动
@@ -58,21 +58,27 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
 
   useEffect(() => {
     if (enablePullDown) {
-      bScroller?.openPullDown({
-        threshold: 100,
-        stop: 50
-      });
+      bScroller?.openPullDown(
+        pullDownConfig || {
+          threshold: 100,
+          stop: 50
+        }
+      );
     } else {
       bScroller?.closePullDown();
     }
     return () => {
       bScroller?.closePullDown();
     };
-  }, [bScroller, enablePullDown]);
+  }, [bScroller, enablePullDown, pullDownConfig]);
 
   useEffect(() => {
     if (enablePullUp) {
-      bScroller?.openPullUp({ threshold: 0 });
+      bScroller?.openPullUp(
+        pullUpConfig || {
+          threshold: 0
+        }
+      );
     } else {
       bScroller?.closePullUp();
     }
@@ -80,7 +86,7 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
     return () => {
       bScroller?.closePullUp();
     };
-  }, [bScroller, enablePullUp]);
+  }, [bScroller, enablePullUp, pullUpConfig]);
 
   // 销毁滚动
   useEffect(() => {
