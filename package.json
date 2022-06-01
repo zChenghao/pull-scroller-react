@@ -1,0 +1,34 @@
+{
+  "name": "pull-scroller-react",
+  "sideEffects": false,
+  "version": "1.2.9",
+  "description": "A scroll component based on React and Better-Scroll for mobile web app",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "keywords": [
+    "scroll",
+    "load",
+    "refresh",
+    "pull",
+    "react"
+  ],
+  "author": "zhuchenghao",
+  "license": "MIT",
+  "devDependencies": {
+    "@better-scroll/core": "^2.4.2",
+    "@better-scroll/pull-down": "^2.4.2",
+    "@better-scroll/pull-up": "^2.4.2",
+    "@types/react": "^18.0.9",
+    "react": "^18.1.0",
+    "terser-webpack-plugin": "^5.3.1",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.2",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2"
+  },
+  "files": [
+    "dist"
+  ]
+}
