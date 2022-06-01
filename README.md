@@ -17,7 +17,7 @@ npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up
 ## Usage
 
 ```javascript
-import PullScroller from '@pull-scroller/react';
+import PullScroller from 'pull-scroller-react';
 ```
 
 ### Simple usage
