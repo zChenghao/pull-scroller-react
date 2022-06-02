@@ -51,7 +51,7 @@ export default function usePullUp(
           finish(true);
         }
       } else {
-        // handlePullUpLoad 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束刷新
+        // handlePullUpLoad 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束上拉加载
         console.log('sync callback');
         handlePullUpLoad(finish);
       }

@@ -1,5 +1,7 @@
 # pull-scroller-react
 
+## Introduction
+
 A scroll component based on React and Better-Scroll for mobile web app  
 
 ## Installation
@@ -162,6 +164,136 @@ function App() {
   );
 }
 ```
+
+## Props
+
++ height(default 100%) —— Height of scrolling area.The default value is '100%'.The value is of type string.(ex: '100px','100vh')  
+This props is required in most cases.
+
++ enablePullDown —— Whether to enable pull-down components.If the value is true, handleRefresh is required.
+
++ enablePullUp —— Whether to enable pull-up components.If the value is true, handlePullUpLoad is required.
+
++ enableBackTop —— Whether to enable back top components.
+
++ pullDownConfig —— Pull down config.When using custom refresh component this parameter may be required.  
+Default value is { threshold: 100, stop: 50} (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance)
+
++ pullUpConfig —— Pull up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).
+
++ handleScroll —— Custom scroll event.When you want to do something while the page is scrolling.
+
++ handleRefresh —— The event handler that executes when the pull-down triggers.It can be a normal function or an asyn function.  
+When it's an async function,the function completes and the pull-down automatically ends.When it is not an async function, the method receives a finish method, and you need to manually terminate the pull-down refresh in your own code logic.  
+
+source code:
+
+```javascript
+  // finish 方法执行时，延时 300ms触发 BScroll.finishPullDown(),
+  // 期间可以对刷新组件状态变化做控制，比如刷新完成友好提示，增加用户体验
+  const finish = useCallback(
+    (result?: boolean) => {
+      if (bScroller) {
+        // const tipsDelay = result ? 500 : 300;
+        const tipsDelay = 300;
+        console.log('finish pullDown');
+        setIsPullingDown(false);
+        if (result !== undefined) {
+          setIsRefreshError(result);
+        } else {
+          setIsRefreshError(false);
+        }
+        setTimeout(() => {
+          bScroller.finishPullDown();
+        }, tipsDelay);
+        setTimeout(() => {
+          setBeforePullDown(true);
+        }, tipsDelay + 50);
+      }
+    },
+    [bScroller]
+  );
+
+  const pullingDownHandler = useCallback(async () => {
+    console.log('trigger pullDown');
+    if (handleRefresh) {
+      const isasync = isAsync(handleRefresh);
+      setBeforePullDown(false);
+      setIsPullingDown(true);
+      if (isasync) {
+        // console.log('async callback');
+        try {
+          await handleRefresh();
+          finish(false);
+        } catch {
+          finish(true);
+        }
+      } else {
+        // console.log('sync callback');
+        handleRefresh(finish);
+      }
+    }
+  }, [finish, handleRefresh]);
+```
+
++ handlePullUpLoad —— The event handler that executes when the pull-up triggers.It can be a normal function or an asyn function.  
+When it's an async function,the function completes and the pull-up automatically ends.When it is not an async function, the method receives a finish method,and you need to manually terminate the pull-up in your own code logic.  
+source code
+
+```javascript
+  const finish = useCallback(
+    (result?: boolean) => {
+      if (bScroller) {
+        const tipDelay = result ? 500 : 350;
+        // const tipDelay = 350;
+        console.log('finish pullUp');
+        setIsPullUpLoad(false);
+        if (result !== undefined) {
+          setIsPullLoadError(result);
+        } else {
+          setIsPullLoadError(false);
+        }
+        setTimeout(() => {
+          bScroller.finishPullUp();
+        }, 200);
+        setTimeout(() => {
+          setBeforePullUp(true);
+        }, tipDelay);
+      }
+    },
+    [bScroller]
+  );
+
+ const pullingUpHandler = useCallback(async () => {
+    console.log('trigger pullUp');
+    if (handlePullUpLoad) {
+      const judgeAsync = isAsync(handlePullUpLoad);
+      setBeforePullUp(false);
+      setIsPullUpLoad(true);
+
+      if (judgeAsync) {
+        // console.log('async callback');
+        try {
+          await handlePullUpLoad();
+          finish(false);
+        } catch {
+          finish(true);
+        }
+      } else {
+        // console.log('sync callback');
+        handlePullUpLoad(finish);
+      }
+    }
+  }, [finish, handlePullUpLoad]);
+```
+
++ refresher —— Custom refresh component.
+
++ pullLoader —— Custom load more component.
+
++ backTop —— Custom return back top component.
+
++ isPreventDefault ——  Whether to block browser default behavior.
 
 ## Props Interface
 

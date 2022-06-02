@@ -63,7 +63,7 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
     const scroller = bScroller?.scroller;
     const translater = scroller?.translater.hooks;
 
-    const move = throttle(scroll, 100);
+    const move = throttle(scroll, 50);
 
     const scrollEnd = (pos) => {
       updateScrollY(pos.y);

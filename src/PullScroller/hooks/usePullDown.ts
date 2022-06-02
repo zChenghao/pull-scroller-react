@@ -53,7 +53,7 @@ export default function usePullDown(
           finish(true);
         }
       } else {
-        // handleRefresh 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束刷新
+        // handleRefresh 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束下拉刷新
         console.log('sync callback');
         handleRefresh(finish);
       }
