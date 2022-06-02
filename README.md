@@ -183,7 +183,7 @@ Default value is { threshold: 100, stop: 50} (threshold: the distance from the t
 
 + handleScroll —— Custom scroll event.When you want to do something while the page is scrolling.
 
-+ handleRefresh —— The event handler that executes when the pull-down triggers.It can be a normal function or an asyn function.  
++ handleRefresh —— The event handler that executes when the pull-down triggers.It can be a normal function or an asyn function.
 When it's an async function,the function completes and the pull-down automatically ends.When it is not an async function, the method receives a finish method, and you need to manually terminate the pull-down refresh in your own code logic.  
 
 source code:
@@ -236,7 +236,7 @@ source code:
   }, [finish, handleRefresh]);
 ```
 
-+ handlePullUpLoad —— The event handler that executes when the pull-up triggers.It can be a normal function or an asyn function.  
++ handlePullUpLoad —— The event handler that executes when the pull-up triggers.It can be a normal function or an asyn function.
 When it's an async function,the function completes and the pull-up automatically ends.When it is not an async function, the method receives a finish method,and you need to manually terminate the pull-up in your own code logic.  
 source code
 
@@ -298,6 +298,29 @@ source code
 ## Props Interface
 
 ```typescript
+interface RefresherProps {
+  beforePullDown: boolean;
+  isPullingDown: boolean;
+  isRefreshError: boolean;
+}
+
+interface PullLoaderProps {
+  beforePullUp: boolean;
+  isPullUpLoading: boolean;
+  isPullLoadError: boolean;
+}
+
+interface BackTopProps {
+  handleScrollToTop: () => void;
+  show: boolean;
+}
+
+type RefresherMaker = (props: RefresherProps) => ReactNode;
+
+type PullLoaderMaker = (props: PullLoaderProps) => ReactNode;
+
+type BackToperMaker = (props: BackTopProps) => ReactNode;
+
 interface ScrollProps {
   readonly height?: string; // Height of scrolling area.The default value is '100%'
   readonly enablePullDown?: boolean; // enable pulldown (refresh)
