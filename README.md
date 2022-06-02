@@ -189,8 +189,11 @@ When it's an async function,the function completes and the pull-down automatical
 source code:
 
 ```javascript
-  // finish 方法执行时，延时 300ms触发 BScroll.finishPullDown(),
-  // 期间可以对刷新组件状态变化做控制，比如刷新完成友好提示，增加用户体验
+  /*
+    Bscroll.finishpulldown () is triggered when the finish method is executed after 300ms.
+    During the refresh component state changes can be controlled, 
+    such as refresh complete friendly prompt, increase user experience
+  */
   const finish = useCallback(
     (result?: boolean) => {
       if (bScroller) {
