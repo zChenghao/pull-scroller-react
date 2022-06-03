@@ -15,6 +15,8 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
   const initScroller = useCallback(
     (el: string | HTMLElement) => {
       console.log('init scroll');
+      const pullDownCon = pullDownConfig ?? { threshold: 100, stop: 50 };
+      const pullUpCon = pullUpConfig ?? { threshold: 0 };
       setBScroller(
         new BScroll(el, {
           click: true,
@@ -23,15 +25,10 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
           preventDefault: isPreventDefault ?? true, // 是否阻止浏览器默认行为
           // probeType: 3
           // 下拉刷新配置
-          pullDownRefresh: pullDownConfig || {
-            threshold: 100,
-            stop: 50
-          },
+          pullDownRefresh: pullDownCon,
           // 上拉加载
           // pullUpLoad: true
-          pullUpLoad: pullUpConfig || {
-            threshold: 0
-          }
+          pullUpLoad: pullUpCon
         })
       );
     },
@@ -58,12 +55,8 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
 
   useEffect(() => {
     if (enablePullDown) {
-      bScroller?.openPullDown(
-        pullDownConfig || {
-          threshold: 100,
-          stop: 50
-        }
-      );
+      const pullDownCon = pullDownConfig ?? { threshold: 100, stop: 50 };
+      bScroller?.openPullDown(pullDownCon);
     } else {
       bScroller?.closePullDown();
     }
@@ -74,11 +67,8 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
 
   useEffect(() => {
     if (enablePullUp) {
-      bScroller?.openPullUp(
-        pullUpConfig || {
-          threshold: 0
-        }
-      );
+      const pullUpCon = pullUpConfig ?? { threshold: 0 };
+      bScroller?.openPullUp(pullUpCon);
     } else {
       bScroller?.closePullUp();
     }
@@ -101,51 +91,3 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
 
   return { bScroller };
 }
-
-/* ============ 滚动事件相关 ============ */
-
-// 计算 Y轴 滚动距离
-// const calcScrollY = (y: number) => {
-//   if (y > 0) return 0;
-//   const dis = y.toString();
-//   const scrollY = Math.abs(parseInt(dis, 10));
-//   return scrollY;
-// };
-
-// // 更新 Y轴 滚动距离
-// const updateScrollY = useCallback((y?: number) => {
-//   if (y === undefined || y === null) return;
-//   const scrollY = calcScrollY(y);
-//   setScrollY(scrollY);
-// }, []);
-
-// // 滚动事件
-// const scroll = useCallback(
-//   (pos) => {
-//     updateScrollY(pos.y);
-//     const scrollY = calcScrollY(pos.y);
-//     if (handleScroll) {
-//       handleScroll.call(null, scrollY);
-//     }
-//   },
-//   [handleScroll, updateScrollY]
-// );
-
-// useEffect(() => {
-//   const scroller = bScroller?.scroller;
-//   const translater = scroller?.translater.hooks;
-//   const move = throttle(scroll, 500);
-//   const scrollEnd = (pos) => {
-//     updateScrollY(pos.y);
-//   };
-//   if (translater) {
-//     console.log(translater);
-//     translater.on('translate', move);
-//     scroller.hooks.on('scrollEnd', scrollEnd);
-//   }
-//   return () => {
-//     // console.log('off', translater?.events);
-//     translater?.off('translate', move);
-//     scroller?.hooks.off('scrollEnd', scrollEnd);
-//   };
-// }, [bScroller, scroll, updateScrollY]);

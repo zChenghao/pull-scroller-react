@@ -177,9 +177,27 @@ This props is required in most cases.
 + enableBackTop —— Whether to enable back top components.
 
 + pullDownConfig —— Pull down config.When using custom refresh component this parameter may be required.  
-Default value is { threshold: 100, stop: 50} (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance)
+Default value is { threshold: 100, stop: 50} (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because
+this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
+to drag.  
+So you define the configuration like this
 
-+ pullUpConfig —— Pull up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).
+```javascript
+  const pullDownConfig = useMemo(() => ({ threshold: 150, stop: 100 }), []); // Recommend
+  // or
+  const [pullDownConfig,setPullDownConfig] = useState({ threshold: 150, stop: 100 });
+```
+
++ pullUpConfig —— Pull up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).You must define this value using either useMemo or useState,because
+this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
+to drag.  
+So you define the configuration like this
+
+```javascript
+  const pullUpConfig = useMemo(() => ({ threshold: 50 }), []); // Recommend
+  // or
+  const [pullUpConfig,setPullUpConfig] = useState({ threshold: 50 });
+```
 
 + handleScroll —— Custom scroll event.When you want to do something while the page is scrolling.
 

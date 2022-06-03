@@ -1,4 +1,4 @@
-export declare module 'pull-scroller-react' {
+declare module 'pull-scroller-react' {
   import { PropsWithChildren, ReactNode } from 'react';
   import { BScrollConstructor } from '@better-scroll/core/dist/types/BScroll';
   import { PullDownRefreshOptions } from '@better-scroll/pull-down';
