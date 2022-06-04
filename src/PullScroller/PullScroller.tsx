@@ -11,7 +11,7 @@ export default function PullScroller(props: ScrollerProps) {
   const { beforePullUp, isPullUpLoading, isPullLoadError } = usePullUp(bScroller, props);
   const { refresher, pullLoader, backTop } = props;
 
-  const showBackTop = useMemo(() => !switchBackTop && scrollY > 600, [scrollY, switchBackTop]);
+  const showBackTop = useMemo(() => !switchBackTop && scrollY > 300, [scrollY, switchBackTop]);
 
   const Refrehser = useMemo(() => {
     if (refresher) {

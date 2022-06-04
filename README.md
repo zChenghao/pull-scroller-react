@@ -1,20 +1,18 @@
 # pull-scroller-react
 
+[Demos](https://github.com/zChenghao/demos-pull-scroller-react)
+
 ## Introduction
 
 A scroll component based on React and Better-Scroll for mobile web app  
 
 ## Installation
 
-npm install pull-scroller-react  
-
-or  
-
-yarn add pull-scroller-react
+`$ npm install pull-scroller-react`
 
 **Note: This component needs to run react > 16.8,and the component is encapsulated in the Better-Scroll package.So you need to install dependencies in your project.**
 
-npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up
+`$ npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up`
 
 ## Usage
 
@@ -176,10 +174,10 @@ This props is required in most cases.
 
 + enableBackTop —— Whether to enable back top components.
 
-+ pullDownConfig —— Pull down config.When using custom refresh component this parameter may be required.  
-Default value is { threshold: 100, stop: 50} (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because
-this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
-to drag.  
++ pullDownConfig —— Pull down config.When using custom refresh component this parameter may be required.Default value
+is { threshold: 100, stop: 50 } (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because this configuration accepts an object (the value 
+of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to drag.  
+
 So you define the configuration like this
 
 ```javascript
@@ -190,7 +188,8 @@ So you define the configuration like this
 
 + pullUpConfig —— Pull up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).You must define this value using either useMemo or useState,because
 this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
-to drag.  
+to drag.
+  
 So you define the configuration like this
 
 ```javascript

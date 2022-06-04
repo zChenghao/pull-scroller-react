@@ -44,17 +44,7 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const scrollToTop = useCallback(
     debounce(() => {
-      const extraTransform = {
-        // 起点的属性
-        start: {
-          scale: 0
-        },
-        // 终点的属性
-        end: {
-          scale: 1.1
-        }
-      };
-      bScroller?.scrollTo(0, 0, 300, undefined, extraTransform);
+      bScroller?.scrollTo(0, 0, 300, undefined);
     }),
     [bScroller]
   );
