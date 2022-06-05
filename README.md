@@ -42,93 +42,66 @@ return (
 ### Custom state components for loading, refreshing, and returning to the top
 
 ```javascript
-function App() {
-  const [list, setList] = useState<string[]>([]);
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import PullScoller, { PullLoaderMaker, RefresherMaker } from 'pull-scroller-react';
+import { CustomBackTop, PullDownLoader, PullUpLoader } from '../../components/CustomLoaders';
+import { DemoList } from '../../components';
+import { ListItem, mockGetListData } from '../../utils/getMockData';
+
+export default function CustomLoadersPage() {
+  const pageIndex = useRef(0);
+  const pageTotal = useRef(75);
+  const [list, setList] = useState<ListItem[]>([]);
+  const [enablePullUp, setEnablePullUp] = useState(false);
   const [noMoreData, setNoMoreData] = useState(false);
-  const listCount = useRef(0);
 
-  const addListData = useCallback((start = 0, count = 15) => {
-    const end = start + count;
-    console.log(`add start is ${start},end is ${end}`);
-    // console.log('add list item');
-    if (!start) setList([]);
-    for (let i = start; i < end; i++) {
-      setList((prev) => [...prev, `This is item${i}`]);
-    }
+  const pullDownConfig = useMemo(() => ({ threshold: 120, stop: 60 }), []);
+
+  useEffect(() => {
+    mockGetListData(0, 30, 300)
+      .then((res) => {
+        setList(res);
+        setEnablePullUp(true);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    return () => {
+      setList([]);
+    };
   }, []);
 
   useEffect(() => {
-    if (!list.length) {
-      addListData(0, 30);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    listCount.current = list.length;
+    pageIndex.current = list.length;
   }, [list]);
 
-  // Mock request
-  const getData = async (time) => {
-    const res = await timeout(time);
-    console.log(`getData ${res}`);
-    return `get ${res}`;
-  };
+  const refresh = useCallback(async () => {
+    const res = await mockGetListData(0, 30);
+    setList(res);
+  }, []);
 
-  const refresh = useCallback(
-    (done) => {
-      getData(1000).then((res) => {
-        console.log('refresh', res);
-        listCount.current = 0;
-        addListData(0, 30);
-        done();
-      });
-    },
-    [addListData]
-  );
-
-  const loadMore = useCallback(
-    (complete) => {
-      if (noMoreData && listCount.current >= 75) {
-        complete();
-        return;
-      }
-      setNoMoreData(false);
-      getData(1000).then((res) => {
-        console.log('load more', res);
-        if (listCount.current < 75) {
-          addListData(listCount.current);
-        } else {
-          setNoMoreData(true);
-        }
-        complete();
-      });
-    },
-    [addListData, noMoreData]
-  );
-
-  const asyncCallback = useCallback(async () => {
-    if (noMoreData && listCount.current >= 75) return;
+  const loadMore = useCallback(async () => {
+    if (noMoreData && pageIndex.current >= pageTotal.current) return;
     setNoMoreData(false);
-    const res = await getData(1000);
-    console.log('===== do something by using res ======');
-    console.log('microtask exec', res);
-    if (listCount.current < 75) {
-      addListData(listCount.current);
+    const res = await mockGetListData(pageIndex.current, 15);
+    if (pageIndex.current < pageTotal.current) {
+      setList((prev) => [...prev, ...res]);
     } else {
+      // 模拟没有更多数据
+      console.log('set no more');
       setNoMoreData(true);
     }
-  }, [addListData, noMoreData]);
+  }, [noMoreData]);
 
   const refresher: RefresherMaker = useCallback(({ beforePullDown, isPullingDown, isRefreshError }) => {
     return (
-      <CustomRefresher beforePullDown={beforePullDown} isPullingDown={isPullingDown} isRefreshError={isRefreshError} />
+      <PullDownLoader beforePullDown={beforePullDown} isPullingDown={isPullingDown} isRefreshError={isRefreshError} />
     );
   }, []);
 
-  const pullLoader = useCallback(
+  const pullLoader: PullLoaderMaker = useCallback(
     ({ beforePullUp, isPullUpLoading, isPullLoadError }) => (
-      <CustomPullLoader
+      <PullUpLoader
         beforePullUp={beforePullUp}
         isPullUpLoading={isPullUpLoading}
         isPullLoadError={isPullLoadError}
@@ -144,21 +117,20 @@ function App() {
   );
 
   return (
-    <div className="app">
-      <PullScoller
-        height="100vh"
-        enablePullDown
-        enablePullUp
-        enableBackTop
-        handleRefresh={refresh}
-        handlePullUpLoad={asyncCallback}
-        refresher={refresher}
-        pullLoader={pullLoader}
-        backTop={BackTop}
-      >
-       <List list={list} />
-      </PullScoller>
-    </div>
+    <PullScoller
+      height="100vh"
+      enablePullDown
+      enablePullUp={enablePullUp}
+      enableBackTop
+      pullDownConfig={pullDownConfig}
+      handleRefresh={refresh}
+      handlePullUpLoad={loadMore}
+      refresher={refresher}
+      pullLoader={pullLoader}
+      backTop={BackTop}
+    >
+      <DemoList list={list} />
+    </PullScoller>
   );
 }
 ```
@@ -188,8 +160,8 @@ So you define the configuration like this
 
 + pullUpConfig —— Pull up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).You must define this value using either useMemo or useState,because
 this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
-to drag.
-  
+to drag.  
+
 So you define the configuration like this
 
 ```javascript

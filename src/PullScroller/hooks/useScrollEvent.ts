@@ -36,7 +36,6 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
         handleScroll(scrollY);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [handleScroll]
   );
 
@@ -51,7 +50,6 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
 
   useEffect(() => {
     const scroller = bScroller?.scroller;
-    const translater = scroller?.translater.hooks;
 
     const move = throttle(scroll, 50);
 
@@ -60,18 +58,17 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
       setSwitchBackTop(false);
     };
 
-    if (translater && (handleScroll || enableBackTop)) {
+    if (scroller && (handleScroll || enableBackTop)) {
       if (enableBackTop) setSwitchBackTop(false);
       console.log('bind scroll');
-      console.log(translater);
-      translater.on('translate', move);
+      scroller.hooks.on('scroll', move);
       scroller.hooks.on('scrollEnd', scrollEnd);
     }
     return () => {
-      if (handleScroll) {
+      if (handleScroll || enableBackTop) {
         console.log('off scroll');
-        translater?.off('translate', move);
-        scroller?.hooks.off('scrollEnd', scrollEnd);
+        if (scroller?.hooks.eventTypes.scroll) scroller.hooks.off('scroll', move);
+        if (scroller?.hooks.eventTypes.scrollEnd) scroller.hooks.off('scrollEnd', scrollEnd);
       }
     };
   }, [bScroller, enableBackTop, handleScroll, scroll, updateScrollY]);

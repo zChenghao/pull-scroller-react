@@ -68,7 +68,7 @@ export default function PullScroller(props: ScrollerProps) {
     <div
       ref={scrollRef}
       className="loadscroll__wrapper"
-      style={{ height: props.height || '100%', overflow: 'hidden', position: 'relative' }}
+      style={{ position: 'relative', overflowY: 'hidden', height: props.height || '100%' }}
     >
       <div>
         {props.enablePullDown ? (
