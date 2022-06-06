@@ -54,8 +54,8 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
     const move = throttle(scroll, 50);
 
     const scrollEnd = (pos) => {
-      updateScrollY(pos.y);
       setSwitchBackTop(false);
+      updateScrollY(pos.y);
     };
 
     if (scroller && (handleScroll || enableBackTop)) {

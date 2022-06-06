@@ -59,13 +59,14 @@ export default function usePullUp(
   }, [finish, handlePullUpLoad]);
 
   useEffect(() => {
-    if (enablePullUp && bScroller) {
+    const hasEvent = enablePullUp && bScroller && bScroller.eventTypes.pullingUp;
+    if (hasEvent) {
       console.log('bind pullLoad');
       bScroller.on('pullingUp', pullingUpHandler);
     }
 
     return () => {
-      if (bScroller) {
+      if (hasEvent) {
         console.log('off pullLoad');
         bScroller.off('pullingUp', pullingUpHandler);
       }

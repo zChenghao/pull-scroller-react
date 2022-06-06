@@ -1,4 +1,4 @@
-# pull-scroller-react
+# pull-scroller-react v1.3.x
 
 [Demos](https://github.com/zChenghao/demos-pull-scroller-react)
 
@@ -282,7 +282,7 @@ This props is required in most cases.
 + enableBackTop —— Whether to enable back top components.
 
 + pullDownConfig —— Pull down config.When using custom refresh component this parameter may be required.Default value
-is { threshold: 100, stop: 50 } (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because this configuration accepts an object (the value 
+is { threshold: 90, stop: 40 } (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because this configuration accepts an object (the value
 of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to drag.  
 
 So you define the configuration like this
@@ -420,7 +420,7 @@ source code
 
 + observeImg —— Using ObserveImage Plugin.
 
-+ extraConfig —— better-scroll configurations, will overrides the default configuration.([Configurations](https://better-scroll.github.io/docs/en-US/guide/base-scroll-options.html))  
++ extraConfig —— better-scroll configurations, will overrides the default configuration.You should define this value using either useMemo or useState,because this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to drag. ([Configurations](https://better-scroll.github.io/docs/en-US/guide/base-scroll-options.html))  
 
 Ddefault configuration:
 

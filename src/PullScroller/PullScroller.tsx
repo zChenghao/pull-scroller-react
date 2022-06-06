@@ -4,9 +4,9 @@ import { ScrollerProps } from './type';
 
 export default function PullScroller(props: ScrollerProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement);
   const { refresher, pullLoader, backTop } = props;
 
+  const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement);
   const { scrollY, switchBackTop, scrollToTop } = useScrollEvent(bScroller, props);
   const { beforePullDown, isPullingDown, isRefreshError } = usePullDown(bScroller, props);
   const { beforePullUp, isPullUpLoading, isPullLoadError } = usePullUp(bScroller, props);

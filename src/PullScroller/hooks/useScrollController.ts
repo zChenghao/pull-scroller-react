@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import BScroll from '@better-scroll/core';
 import PullDown from '@better-scroll/pull-down';
 import Pullup from '@better-scroll/pull-up';
@@ -10,11 +10,11 @@ BScroll.use(Pullup);
 BScroll.use(ObserveImage);
 
 export default function useScrollController(props: ScrollerProps, el: HTMLElement | string) {
-  const bscroller = useRef<ScrollConstructor>();
-  const { enablePullDown, enablePullUp, observeImg, extraConfig } = props;
-
-  const pullDownCon = useMemo(() => props.pullDownConfig ?? { threshold: 100, stop: 50 }, [props.pullDownConfig]);
-  const pullUpCon = useMemo(() => props.pullUpConfig ?? { threshold: 0 }, [props.pullUpConfig]);
+  const bscroller = useRef<ScrollConstructor | null | undefined>();
+  const [bScroller, setBScroller] = useState<ScrollConstructor>();
+  const { enablePullDown, enablePullUp, observeImg, extraConfig, pullDownConfig, pullUpConfig } = props;
+  const pullDownCon = useMemo(() => pullDownConfig ?? true, [pullDownConfig]);
+  const pullUpCon = useMemo(() => pullUpConfig ?? true, [pullUpConfig]);
 
   // 初始化滚动方法
   const initScroller = useCallback(
@@ -32,16 +32,24 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
         pullUpLoad: pullUpCon,
         ...extraOpt
       };
-      if (observeImg) return new BScroll(el, { ...baseConfig, observeImage: observeImg });
-      return new BScroll(el, baseConfig);
+
+      let conf: typeof baseConfig = { ...baseConfig };
+
+      if (observeImg) conf = { ...conf, observeImage: observeImg };
+
+      return new BScroll(el, conf);
     },
-    [extraConfig, observeImg]
+    [extraConfig, observeImg, pullDownCon, pullUpCon]
   );
+
+  useEffect(() => {
+    bscroller.current = bScroller;
+  }, [bScroller]);
 
   // 初始化滚动
   useEffect(() => {
     if (el) {
-      bscroller.current = initScroller(el);
+      setBScroller(initScroller(el));
     }
     // 销毁滚动
     return () => {
@@ -63,27 +71,27 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
   // 是否开始下拉刷新
   useEffect(() => {
     if (enablePullDown) {
-      bscroller.current?.openPullDown(pullDownCon);
+      bScroller?.openPullDown(pullDownCon);
     } else {
-      bscroller.current?.closePullDown();
+      bScroller?.closePullDown();
     }
     return () => {
-      bscroller.current?.closePullDown();
+      if (enablePullDown) bScroller?.closePullDown();
     };
-  }, [enablePullDown, pullDownCon]);
+  }, [bScroller, enablePullDown, pullDownCon]);
 
   // 否开启上拉加载
   useEffect(() => {
     if (enablePullUp) {
-      bscroller.current?.openPullUp(pullUpCon);
+      bScroller?.openPullUp(pullUpCon);
     } else {
-      bscroller.current?.closePullUp();
+      bScroller?.closePullUp();
     }
 
     return () => {
-      bscroller.current?.closePullUp();
+      if (enablePullUp) bScroller?.closePullUp();
     };
-  }, [enablePullUp, pullUpCon]);
+  }, [bScroller, enablePullUp, pullUpCon]);
 
-  return { bScroller: bscroller.current };
+  return { bScroller };
 }

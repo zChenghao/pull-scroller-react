@@ -61,13 +61,14 @@ export default function usePullDown(
   }, [finish, handleRefresh]);
 
   useEffect(() => {
-    if (enablePullDown && bScroller) {
-      console.log('bind refresh');
+    const hasEvent = enablePullDown && bScroller && bScroller.eventTypes.pullingDown;
+    if (hasEvent) {
+      console.log('bind pullingDown');
       bScroller.on('pullingDown', pullingDownHandler);
     }
     return () => {
-      if (bScroller) {
-        console.log('off refresh');
+      if (hasEvent) {
+        console.log('off pullingDown');
         bScroller.off('pullingDown', pullingDownHandler);
       }
     };
