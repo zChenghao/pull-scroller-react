@@ -1,4 +1,6 @@
+import { Options } from '@better-scroll/core';
 import { BScrollConstructor } from '@better-scroll/core/dist/types/BScroll';
+import { ObserveImageOptions } from '@better-scroll/observe-image';
 import { PullDownRefreshOptions } from '@better-scroll/pull-down';
 import { PullUpLoadOptions } from '@better-scroll/pull-up';
 import { PropsWithChildren, ReactNode } from 'react';
@@ -57,7 +59,8 @@ export interface ScrollProps {
   readonly refresher?: RefresherMaker | ReactNode; // custom refresh component
   readonly pullLoader?: PullLoaderMaker | ReactNode; // custom load more component
   readonly backTop?: BackToperMaker | ReactNode; // custom return back top component
-  readonly isPreventDefault?: boolean; // Whether to block browser default behavior
+  readonly observeImg?: ObserveImageOptions; // Using ObserveImage Plugin
+  readonly extraConfig?: Options; // better-scroll configurations, will overrides the default configuration.
 }
 
 export type ScrollerProps = PropsWithChildren<ScrollProps>;

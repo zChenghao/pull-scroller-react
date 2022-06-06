@@ -20,7 +20,7 @@ export const DefaultBackTop: React.FC<BackTopProps> = memo(({ show, handleScroll
       }}
       onClick={handleScrollToTop}
     >
-      Back
+      Top
     </div>
   );
 });

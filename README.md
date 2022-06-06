@@ -8,11 +8,15 @@ A scroll component based on React and Better-Scroll for mobile web app
 
 ## Installation
 
-`$ npm install pull-scroller-react`
+```shell
+npm install pull-scroller-react
+```
 
 **Note: This component needs to run react > 16.8,and the component is encapsulated in the Better-Scroll package.So you need to install dependencies in your project.**
 
-`$ npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up`
+```shell
+npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up @better-scroll/observe-image
+```
 
 ## Usage
 
@@ -31,7 +35,7 @@ return (
       enablePullUp
       enableBackTop
       handleRefresh={refresh}
-      handlePullUpLoad={asyncCallback}
+      handlePullUpLoad={loadMore}
     >
       <List list={list} />
     </PullScoller>
@@ -87,7 +91,6 @@ export default function CustomLoadersPage() {
     if (pageIndex.current < pageTotal.current) {
       setList((prev) => [...prev, ...res]);
     } else {
-      // 模拟没有更多数据
       console.log('set no more');
       setNoMoreData(true);
     }
@@ -133,6 +136,138 @@ export default function CustomLoadersPage() {
     </PullScoller>
   );
 }
+```
+
+## Possible problems in use
+
++ When the page has `<img />`.It is possible that the page has been rendered but the image has not been loaded.The PullScoller component is unable to monitor picture loading completion,so after the image is loaded, refresh() is not triggered,this may causes problems with page scrolling.  
+There are two recommended ways.  
+  + If possible, set the width and height for the image or its parent container (this is the recommended way).  
+  
+  Set the image size directly
+  
+  style.module.css
+
+  ```css
+  .banner-img {
+    width: 300px;
+    height: 200px;
+  }
+  ```
+
+  App.js
+
+  ```javascript
+  import style from './style.module.css';
+  
+  function App(){
+     return (
+      <LoadScroll height={height: '100vh'}>
+        <img className={style['banner-img']} src="imgurl" alt="" />
+      </LoadScroll>   
+    );
+  }
+  ```
+  
+  Set the parent container size  
+
+  style.module.css
+
+  ```css
+  .banner {
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%;
+  }
+
+  .banner-img {
+    width: 100%;
+  }
+  ```
+
+  App.js
+
+  ```javascript
+  import style from './style.module.css';
+  
+  function App(){
+     return (
+      <LoadScroll height={height: '100vh'}>
+        <div className={style.banner}>
+          <img className={style['banner-img']} src="imgurl" alt="" />
+        </div>
+      </LoadScroll>   
+    );
+  }
+  ```
+
+  + Using the @better-scroll/observe-image plugin. It is easy to use, just set the value of 'observeImg'.
+
+  ```javascript
+  function App(){
+     return (
+      <LoadScroll
+         height={height: '100vh'}
+         observeImg={true}
+         // or
+         // observeImg={{ debounceTime: 100 }}
+       >
+        <img className={style['banner-img']} src="imgurl" alt="" />
+      </LoadScroll>   
+    );
+  }
+  ```
+
+  **Note:This is not recommended.This approach should not be used for scenarios where CSS has been used to determine the image width and height, because each call to Refresh has an impact on performance.  You only need it if the width or height of the image is uncertain.**
+
++ The PullScroller has elements inside that use native scroll.  
+Examples:
+
+```javascript
+  function App(){
+     return (
+      <LoadScroll height={height: '100vh'}>
+          <div calss="wrapper" style={{ width: '100%', height: '200px', overflow: 'scroll' }}>
+            <div style={{ width: '100%', height: '500px'}}></div>
+          </div>
+      </LoadScroll>   
+    );
+  }
+```
+
+In this case, the wrapper may not scroll and the page may shake when sliding inside the wrapper.  
+It may be a bit cumbersome to solve this problem, but there doesn't seem to be any good way to do it right now.  
+You can solve the problem like this:
+
+```javascript
+  import { useEffect, useRef } from 'react';
+
+  function App(){
+    const wrapper = useRef(null);
+
+    useEffect(() => {
+      const dom = wrapper.current;
+      const cb = (e) => {
+        e.stopPropagation();
+      };
+      if (dom ) {
+        dom.addEventListener('touchstart', cb);
+      }
+
+      return () => {
+        setList([]);
+        dom ?.removeEventListener('touchstart', cb);
+      };
+    }, []);
+
+    return (
+      <LoadScroll height={height: '100vh'}>
+          <div ref={wrapper} calss="wrapper" style={{ width: '100%', height: '200px', overflow: 'scroll' }}>
+            <div style={{ width: '100%', height: '500px'}}></div>
+          </div>
+      </LoadScroll>   
+    );
+  }
 ```
 
 ## Props
@@ -186,7 +321,6 @@ source code:
   const finish = useCallback(
     (result?: boolean) => {
       if (bScroller) {
-        // const tipsDelay = result ? 500 : 300;
         const tipsDelay = 300;
         console.log('finish pullDown');
         setIsPullingDown(false);
@@ -237,7 +371,6 @@ source code
     (result?: boolean) => {
       if (bScroller) {
         const tipDelay = result ? 500 : 350;
-        // const tipDelay = 350;
         console.log('finish pullUp');
         setIsPullUpLoad(false);
         if (result !== undefined) {
@@ -285,7 +418,28 @@ source code
 
 + backTop —— Custom return back top component.
 
-+ isPreventDefault ——  Whether to block browser default behavior.
++ observeImg —— Using ObserveImage Plugin.
+
++ extraConfig —— better-scroll configurations, will overrides the default configuration.([Configurations](https://better-scroll.github.io/docs/en-US/guide/base-scroll-options.html))  
+
+Ddefault configuration:
+
+```javascript
+  const baseConfig = {
+    eventPassthrough: 'horizontal',
+    click: true,
+    stopPropagation: true,
+    useTransition: true,
+    pullDownRefresh: pullDownCon,
+    pullUpLoad: pullUpCon,
+  };
+```
+
+## Deprecated props
+
+**Notes: Deprecated props has been removed in the new release and is no longer supported.**
+
++ ~~isPreventDefault ——  Whether to block browser default behavior.(deprecated)~~
 
 ## Props Interface
 
@@ -333,6 +487,7 @@ interface ScrollProps {
   readonly refresher?: RefresherMaker | ReactNode; // custom refresh component
   readonly pullLoader?: PullLoaderMaker | ReactNode; // custom load more component
   readonly backTop?: BackToperMaker | ReactNode; // custom return back top component
-  readonly isPreventDefault?: boolean; // Whether to block browser default behavior
+  readonly observeImg?: ObserveImageOptions; // Using ObserveImage Plugin
+  readonly extraConfig?: Options; // better-scroll configurations, will overrides the default configuration.
 }
 ```

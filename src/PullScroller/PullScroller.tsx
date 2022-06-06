@@ -1,15 +1,15 @@
 import { isValidElement, useMemo, useRef } from 'react';
-import { DefaultBackTop, DefaultPullLoader, DefaultRefresher } from './components';
 import { usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
 import { ScrollerProps } from './type';
 
 export default function PullScroller(props: ScrollerProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement);
+  const { refresher, pullLoader, backTop } = props;
+
   const { scrollY, switchBackTop, scrollToTop } = useScrollEvent(bScroller, props);
   const { beforePullDown, isPullingDown, isRefreshError } = usePullDown(bScroller, props);
   const { beforePullUp, isPullUpLoading, isPullLoadError } = usePullUp(bScroller, props);
-  const { refresher, pullLoader, backTop } = props;
 
   const showBackTop = useMemo(() => !switchBackTop && scrollY > 300, [scrollY, switchBackTop]);
 
@@ -78,20 +78,10 @@ export default function PullScroller(props: ScrollerProps) {
               position: 'absolute',
               width: '100%',
               boxSizing: 'border-box',
-              transform: 'translateY(-100%) translateZ(0)',
-              textAlign: 'center',
-              color: '#999'
+              transform: 'translateY(-100%) translateZ(0)'
             }}
           >
-            {Refrehser ? (
-              Refrehser
-            ) : (
-              <DefaultRefresher
-                beforePullDown={beforePullDown}
-                isPullingDown={isPullingDown}
-                isRefreshError={isRefreshError}
-              />
-            )}
+            {Refrehser ? Refrehser : <div style={{ textAlign: 'center', color: '#999' }}>Loading...</div>}
           </div>
         ) : null}
         {props.children}
@@ -100,17 +90,31 @@ export default function PullScroller(props: ScrollerProps) {
             {PullLoader ? (
               PullLoader
             ) : (
-              <DefaultPullLoader
-                beforePullUp={beforePullUp}
-                isPullUpLoading={isPullUpLoading}
-                isPullLoadError={isPullLoadError}
-              />
+              <div style={{ padding: 15, textAlign: 'center', color: '#999' }}>Loading...</div>
             )}
           </div>
         ) : null}
       </div>
       {props.enableBackTop ? (
-        <>{BackToper ? BackToper : <DefaultBackTop show={showBackTop} handleScrollToTop={scrollToTop} />}</>
+        <>
+          {BackToper ? (
+            BackToper
+          ) : (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: 50,
+                right: 10,
+                width: 50,
+                height: 50,
+                display: showBackTop ? undefined : 'none'
+              }}
+              onClick={scrollToTop}
+            >
+              Top
+            </div>
+          )}
+        </>
       ) : null}
     </div>
   );

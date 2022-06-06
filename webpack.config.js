@@ -3,9 +3,15 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   mode: 'production',
-  entry: './src/index.ts',
+  entry: {
+    index: './src/index.ts',
+    components: {
+      import:'./src/PullScroller/components/index.ts',
+      filename:'PullScroller/components/index.js'
+    }
+  },
   output: {
-    filename: 'index.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
     library: {
       name: 'PullScroller',
@@ -13,7 +19,7 @@ module.exports = {
     }
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js', '.jsx']
+    extensions: ['.tsx', '.ts', '.js']
   },
   externals: [
     {
@@ -32,7 +38,8 @@ module.exports = {
     },
     '@better-scroll/core',
     '@better-scroll/pull-down',
-    '@better-scroll/pull-up'
+    '@better-scroll/pull-up',
+    '@better-scroll/observe-image'
   ],
   optimization: {
     minimize: true,

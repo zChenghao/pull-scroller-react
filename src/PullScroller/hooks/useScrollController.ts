@@ -2,14 +2,16 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import BScroll from '@better-scroll/core';
 import PullDown from '@better-scroll/pull-down';
 import Pullup from '@better-scroll/pull-up';
+import ObserveImage from '@better-scroll/observe-image';
 import { ScrollConstructor, ScrollerProps } from '../type';
 
 BScroll.use(PullDown);
 BScroll.use(Pullup);
+BScroll.use(ObserveImage);
 
 export default function useScrollController(props: ScrollerProps, el: HTMLElement | string) {
   const bscroller = useRef<ScrollConstructor>();
-  const { enablePullDown, enablePullUp, isPreventDefault } = props;
+  const { enablePullDown, enablePullUp, observeImg, extraConfig } = props;
 
   const pullDownCon = useMemo(() => props.pullDownConfig ?? { threshold: 100, stop: 50 }, [props.pullDownConfig]);
   const pullUpCon = useMemo(() => props.pullUpConfig ?? { threshold: 0 }, [props.pullUpConfig]);
@@ -18,23 +20,22 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
   const initScroller = useCallback(
     (el: string | HTMLElement) => {
       console.log('init scroll');
+      const extraOpt = extraConfig ?? {};
       const baseConfig = {
         eventPassthrough: 'horizontal',
         click: true,
         stopPropagation: true,
         useTransition: true,
-        preventDefault: isPreventDefault ?? true, // 是否阻止浏览器默认行为
-        // probeType: 3
         // 下拉刷新配置
         pullDownRefresh: pullDownCon,
         // 上拉加载
-        pullUpLoad: pullUpCon
+        pullUpLoad: pullUpCon,
+        ...extraOpt
       };
-
+      if (observeImg) return new BScroll(el, { ...baseConfig, observeImage: observeImg });
       return new BScroll(el, baseConfig);
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isPreventDefault]
+    [extraConfig, observeImg]
   );
 
   // 初始化滚动
