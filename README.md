@@ -1,5 +1,7 @@
 # pull-scroller-react v1.4.x
 
+[1.3.x Docs](https://github.com/zChenghao/pull-scroller-react/tree/v1.3.x)
+
 [Demos](https://github.com/zChenghao/demos-pull-scroller-react)
 
 ## Introduction
@@ -74,7 +76,7 @@ function BackTopDemo() {
 
 ```javascript
 function PullLoadDemo() {
-   const { windowHeight } = useWindowHeight();
+  const { windowHeight } = useWindowHeight();
   const [list, setList] = useState<ListItem[]>([]);
   const [noMoreData, setNoMoreData] = useState(false);
   const pullDownConfig = useMemo(() => ({ threshold: 100, stop: 60 }), []);
@@ -353,9 +355,13 @@ It provides three states that you can use to control your pull-down component.Of
 States: { beforePullDown: boolean; isPullingDown: boolean; isPullDownError: boolean; }
 
   + `finish`: it can receive a configuration object `{delay?: number; error?: boolean; immediately?: boolean;}`  
-    + delay: the delay of finishing pull-down,default: 300ms
-    + error: set the value of `isPullDownError` provided by `PullScroller`,default value is `false`.It indicates whether there is an error in the pull-down action. You can use the `isPullDownError` to control your pull-down component to display the error status.
-    + immediately: whether to end the pull-down action immediately.If true,pull-down action will finish immediately after `pullUpHandler` is complete.The priority is higher than `delay`.Default value is false.
+    + delay: the delay of finishing pull-down,default: 300ms.
+
+    + error: set the value of `isPullDownError` provided by `PullScroller`, default value is `false`.  
+    It indicates whether there is an error in the pull-down action. You can use the `isPullDownError` to control your pull-down component to display the error status.
+
+    + immediately: whether to end the pull-down action immediately. If true, pull-down action will finish immediately after `pullUpHandler` is complete.The priority is higher than `delay`. Default value is false.
+
   + There are two ways to pass the configuration to `finish()`:  
     When pullDownHandler is an asynchronous function.
 
@@ -389,7 +395,7 @@ States: { beforePullDown: boolean; isPullingDown: boolean; isPullDownError: bool
       } 
     ```
 
-    **Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
+**Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
 
 Source code:
 
@@ -474,9 +480,10 @@ Source code:
   }
 ```
 
-+ pullDownConfig: Pull down config.When using custom refresh component this parameter may be required.Default value
-is { threshold: 90, stop: 40 } (threshold: the distance from the top drop-down to trigger the refresh. stop: rebound hover distance).You must define this value using either useMemo or useState,because this configuration accepts an object (the value
-of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to drag.  
++ pullDownConfig: pull-down config. When using custom refresh component this parameter may be required. Default value
+is `{ threshold: 90, stop: 40 }` (threshold: the distance from the top drop-down to trigger the refresh, stop: rebound hover distance).  
+You must define this value using either `useMemo` or `useState`, because this configuration accepts an object (the value of the reference type). If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to scroll.  
+
 So you define the configuration like this
 
 ```javascript
@@ -493,9 +500,13 @@ It provides three states that you can use to control your pull-down component.Of
 States: { beforePullUp: boolean; isPullingUp: boolean; isPullUpError: boolean; }
 
   + `finish`: it can receive a configuration object `{delay?: number; error?: boolean; immediately?: boolean;}`  
-    + delay: the delay of finishing pull-up,default: 300ms
-    + error: set the value of `isPullUpError` provided by `PullScroller`,default value is `false`.It indicates whether there is an error in the pull-up action. You can use the `isPullUpError` to control your pull-up component to display the error status.
-    + immediately: whether to end the pull-up action immediately，If true，pull-up action will finish immediately after `pullUpHandler` is complete.The priority is higher than `delay`.Default value is false.
+    + delay: the delay of finishing pull-up,default: 300ms.
+
+    + error: set the value of `isPullUpError` provided by `PullScroller`, default value is `false`.  
+    It indicates whether there is an error in the pull-up action. You can use the `isPullUpError` to control your pull-up component to display the error status.
+
+    + immediately: whether to end the pull-up action immediately，If true, pull-up action will finish immediately after `pullUpHandler` is complete.The priority is higher than `delay`. Default value is `false`.
+
   + There are two ways to pass the configuration to `finish()`:  
     When pullUpHandler is an asynchronous function.
 
@@ -529,7 +540,7 @@ States: { beforePullUp: boolean; isPullingUp: boolean; isPullUpError: boolean; }
       } 
     ```
 
-    **Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
+**Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
 
 source code
 
@@ -617,9 +628,8 @@ source code
   }
 ```
 
-+ pullUpConfig: pull-up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).You must define this value using either useMemo or useState,because
-this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable
-to scroll.  
++ pullUpConfig: pull-up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).  
+You must define this value using either `useMemo` or `useState`, because this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal), this may cause the page to be unable to scroll.  
 
 So you define the configuration like this
 
