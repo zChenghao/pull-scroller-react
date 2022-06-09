@@ -395,13 +395,13 @@ States: { beforePullDown: boolean; isPullingDown: boolean; isPullDownError: bool
       } 
     ```
 
-**Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
+  **Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
 
 Source code:
 
 ```typescript
   // finish pull-down
-   const finish = useCallback(
+  const finish = useCallback(
     (state?: FinishState) => {
       const { delay, error, immediately } = state ?? { delay: 300, error: false, immediately: false };
       if (bScroller) {
@@ -496,7 +496,7 @@ So you define the configuration like this
 
 + pullUpHandler: When pull-up is triggered, `pullUpHandler` will execute. It can be a synchronous function or an asynchronous function.  
 When it's an 'async', pull-up will end automatically when `pullUpHandler` execution is finished. When it is a synchronous function, the method receives a `finish` method, and you need to call finish() in your code to end the pull-up.  
-It provides three states that you can use to control your pull-down component.Of course you can also define your own state without using these three states.  
+It provides three states that you can use to control your pull-up component. Of course you can also define your own state without using these three states.  
 States: { beforePullUp: boolean; isPullingUp: boolean; isPullUpError: boolean; }
 
   + `finish`: it can receive a configuration object `{delay?: number; error?: boolean; immediately?: boolean;}`  
@@ -540,13 +540,13 @@ States: { beforePullUp: boolean; isPullingUp: boolean; isPullUpError: boolean; }
       } 
     ```
 
-**Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
+  **Note: This configuration is not required, depending on your actual usage. If not passed, the default value will be used.**
 
 source code
 
 ```typescript
   // finish pull-up 
-   const finish = useCallback(
+  const finish = useCallback(
     (state?: FinishState) => {
       const { delay, error, immediately } = state ?? { delay: 300, error: false, immediately: false };
       // console.log(`delay: ${delay}, error: ${error}, immediately: ${immediately}`);
