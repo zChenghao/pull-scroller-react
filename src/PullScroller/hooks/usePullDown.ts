@@ -1,35 +1,46 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ScrollConstructor, ScrollProps } from '../type';
 import { isAsync } from '../utils/utils';
+import { AsyncPullingHandler, FinishState, PullDownState, ScrollConstructor, ScrollProps, SyncPullingHandler } from '../type';
 
 export default function usePullDown(
-  bScroller: ScrollConstructor | undefined,
-  { enablePullDown, handleRefresh }: ScrollProps
-) {
+  bScroller: ScrollConstructor | undefined | null,
+  { enablePullDown, pullDownHandler }: ScrollProps
+): PullDownState {
   const [beforePullDown, setBeforePullDown] = useState(true);
   const [isPullingDown, setIsPullingDown] = useState(false);
-  const [isRefreshError, setIsRefreshError] = useState(false);
+  const [isPullDownError, setIsPullDownError] = useState(false);
 
-  // finish 方法执行时，延时 300ms触发 BScroll.finishPullDown(),
-  // 期间可以对刷新组件状态变化做控制，比如刷新完成友好提示，增加用户体验
   const finish = useCallback(
-    (result?: boolean) => {
+    (state?: FinishState) => {
+      const { delay, error, immediately } = state ?? { delay: 300, error: false, immediately: false };
+      // console.log(`delay: ${delay}, error: ${error}, immediately: ${immediately}`);
       if (bScroller) {
-        // const tipsDelay = result ? 500 : 300;
-        const tipsDelay = 300;
         console.log('finish pullDown');
         setIsPullingDown(false);
-        if (result !== undefined) {
-          setIsRefreshError(result);
-        } else {
-          setIsRefreshError(false);
-        }
-        setTimeout(() => {
+        error ? setIsPullDownError(error) : setIsPullDownError(false);
+        if (immediately) {
+          // finish immediately
           bScroller.finishPullDown();
-        }, tipsDelay);
-        setTimeout(() => {
           setBeforePullDown(true);
-        }, tipsDelay + 50);
+        } else {
+          // finish delay
+          let timer1;
+          let timer2;
+          const finishDelay = delay === undefined ? (error ? 400 : 300) : error ? delay + 100 : delay;
+          const updateStateDelay = finishDelay + 100;
+
+          timer1 = setTimeout(() => {
+            bScroller.finishPullDown();
+            clearTimeout(timer1);
+            timer1 = null;
+          }, finishDelay);
+
+          timer2 = setTimeout(() => {
+            setBeforePullDown(true);
+            clearTimeout(timer2);
+            timer2 = null;
+          }, updateStateDelay);
+        }
       }
     },
     [bScroller]
@@ -37,28 +48,33 @@ export default function usePullDown(
 
   const pullingDownHandler = useCallback(async () => {
     console.log('trigger pullDown');
-    if (handleRefresh) {
-      const isasync = isAsync(handleRefresh);
+    if (pullDownHandler) {
       setBeforePullDown(false);
       setIsPullingDown(true);
-
-      if (isasync) {
-        // handleRefresh 是 async 函数，函数执行完，自动结束刷新
-        // handleRefresh 是 async 函数时，handleRefresh方法不会接受 finish 函数为参数
-        console.log('async callback');
-        try {
-          await handleRefresh();
-          finish(false);
-        } catch {
-          finish(true);
+      try {
+        const isasync = isAsync(pullDownHandler);
+        if (isasync) {
+          console.log('async callback');
+          // pullDownHandler 是 async 函数，函数执行完，自动结束刷新
+          // pullDownHandler 是 async 函数时，handleRefresh方法不会接受 finish 函数为参数
+          const res = await (pullDownHandler as AsyncPullingHandler)();
+          if (res) {
+            finish(res);
+          } else {
+            finish();
+          }
+        } else {
+          console.log('sync callback');
+          // pullDownHandler 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束刷新
+          (pullDownHandler as SyncPullingHandler )(finish);
         }
-      } else {
-        // handleRefresh 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束下拉刷新
-        console.log('sync callback');
-        handleRefresh(finish);
+      } catch (e: any) {
+        finish({ error: true });
+        if (e instanceof Error) throw e;
+        throw new Error(e);
       }
     }
-  }, [finish, handleRefresh]);
+  }, [finish, pullDownHandler]);
 
   useEffect(() => {
     const hasEvent = enablePullDown && bScroller && bScroller.eventTypes.pullingDown;
@@ -74,5 +90,5 @@ export default function usePullDown(
     };
   }, [bScroller, enablePullDown, pullingDownHandler]);
 
-  return { beforePullDown, isPullingDown, isRefreshError };
+  return { beforePullDown, isPullingDown, isPullDownError };
 }

@@ -5,57 +5,65 @@ import { PullUpLoadOptions } from '@better-scroll/pull-up';
 import { ObserveImageOptions } from '@better-scroll/observe-image';
 import { Options } from '@better-scroll/core';
 
-export interface RefresherProps {
+export interface PullDownState {
   beforePullDown: boolean;
   isPullingDown: boolean;
-  isRefreshError: boolean;
+  isPullDownError: boolean;
 }
 
-export interface PullLoaderProps {
+export interface PullUpState {
   beforePullUp: boolean;
-  isPullUpLoading: boolean;
-  isPullLoadError: boolean;
+  isPullingUp: boolean;
+  isPullUpError: boolean;
+  // hasMore?: boolean;
 }
 
 export interface BackTopProps {
   handleScrollToTop: () => void;
   show: boolean;
+  showAlways: boolean;
 }
 
-export type RefresherMaker = (props: RefresherProps) => ReactNode;
+export type PullDownMaker = (props: PullDownState) => ReactNode;
+export type PullUpMaker = (props: PullUpState) => ReactNode;
+export type BackTopMaker = (props: BackTopProps) => ReactNode;
 
-export type PullLoaderMaker = (props: PullLoaderProps) => ReactNode;
+export interface FinishState {
+  delay?: number;
+  error?: boolean;
+  immediately?: boolean;
+}
 
-export type BackToperMaker = (props: BackTopProps) => ReactNode;
+export type FinishHanlder = (state?: FinishState) => void;
+export type SyncPullingHandler = (complete: FinishHanlder) => void;
+export type AsyncPullingHandler = () => Promise<void | FinishState>;
+
+// export interface PullUpFinishState extends FinishState {
+//   hasMore?: boolean;
+// }
+// export type FinishPullUpHanlder = (state?: PullUpFinishState) => void;
+// export type PullUpHandler = (complete?: FinishPullUpHanlder) => void;
+// export type AsyncPullUpHandler = () => Promise<void | PullUpFinishState>;
 
 export interface ScrollProps {
   readonly height?: string; // Height of scrolling area.The default value is '100%'
-  readonly enablePullDown?: boolean; // enable pulldown (refresh)
-  readonly enablePullUp?: boolean; // enable pullup (load more)
-  readonly enableBackTop?: boolean; // enable back top
   readonly handleScroll?: (scrollY: number) => void; // custom scroll event
-  readonly handleRefresh?: (complete?: () => void) => void | Promise<any>; // refresh handler
-  readonly handlePullUpLoad?: (complete?: () => void) => void | Promise<any>; // pull up load handler
-  readonly refresher?: RefresherMaker | ReactNode; // custom refresh component
-  readonly pullLoader?: PullLoaderMaker | ReactNode; // custom load more component
-  readonly backTop?: BackToperMaker | ReactNode; // custom return back top component
+  // PullDown
+  readonly enablePullDown?: boolean; // enable pulldown (refresh)
+  readonly pullDownHandler?: SyncPullingHandler | AsyncPullingHandler; // pullDown handler
+  readonly pullDownLoader?: PullDownMaker | ReactNode; // refresh component
+  // pull down config. When using custom refresh component this parameter may be required
+  readonly pullDownConfig?: true | { threshold: number; stop: number }; // default: true = {threshold: 90, stop: 40}
+  // PullUp
+  readonly enablePullUp?: boolean; // enable pullup (load more)
+  readonly pullUpHandler?: SyncPullingHandler | AsyncPullingHandler; // pullUp handler
+  readonly pullUpLoader?: PullUpMaker | ReactNode; // load more component
+  // pull up config. When using custom load more component this parameter may be required
+  readonly pullUpConfig?: true | { threshold: number }; // Threshold for triggering the pull-up event,default:true = {threshold:0}
+
+  readonly backTop?: BackTopMaker | ReactNode; // back top element
   readonly observeImg?: ObserveImageOptions;
   readonly extraConfig?: Options;
-  
-  // pull down config. When using custom refresh component this parameter may be required
-  readonly pullDownConfig?:
-    | true
-    | {
-        threshold: number; // The distance from the top drop-down to trigger the refresh. The default value is 100
-        stop: number; // Rebound hover distance. The default value is 50
-      };
-
-  // pull up config. When using custom load more component this parameter may be required
-  readonly pullUpConfig?:
-    | true
-    | {
-        threshold: number; // Threshold for triggering the pull-up event.The default value is 0
-      };
 }
 
 export type ScrollerProps = PropsWithChildren<ScrollProps>;

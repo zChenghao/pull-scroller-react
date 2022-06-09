@@ -1,33 +1,47 @@
 import { useCallback, useEffect, useState } from 'react';
 import { isAsync } from '../utils/utils';
-import { ScrollConstructor, ScrollProps } from '../type';
+import { ScrollProps, ScrollConstructor, FinishState, PullUpState, AsyncPullingHandler, SyncPullingHandler } from '../type';
 
 export default function usePullUp(
-  bScroller: ScrollConstructor | undefined,
-  { enablePullUp, handlePullUpLoad }: ScrollProps
-) {
+  bScroller: ScrollConstructor | undefined | null,
+  { enablePullUp, pullUpHandler }: ScrollProps
+): PullUpState {
   const [beforePullUp, setBeforePullUp] = useState(true);
-  const [isPullUpLoading, setIsPullUpLoad] = useState(false);
-  const [isPullLoadError, setIsPullLoadError] = useState(false);
+  const [isPullingUp, setIsPullingUp] = useState(false);
+  const [isPullUpError, setIsPullUpError] = useState(false);
 
   const finish = useCallback(
-    (result?: boolean) => {
+    (state?: FinishState) => {
+      const { delay, error, immediately } = state ?? { delay: 300, error: false, immediately: false };
+      // console.log(`delay: ${delay}, error: ${error}, immediately: ${immediately}`);
       if (bScroller) {
-        const tipDelay = result ? 500 : 350;
-        // const tipDelay = 350;
         console.log('finish pullUp');
-        setIsPullUpLoad(false);
-        if (result !== undefined) {
-          setIsPullLoadError(result);
-        } else {
-          setIsPullLoadError(false);
-        }
-        setTimeout(() => {
+        setIsPullingUp(false);
+        error ? setIsPullUpError(error) : setIsPullUpError(false);
+
+        if (immediately) {
+          // finish immediately
           bScroller.finishPullUp();
-        }, 200);
-        setTimeout(() => {
           setBeforePullUp(true);
-        }, tipDelay);
+        } else {
+          // finish delay
+          let timer1;
+          let timer2;
+          const finishDelay = delay === undefined ? 300 : delay;
+          const updateStateDelay = error ? finishDelay + 200 : finishDelay + 50;
+
+          timer1 = setTimeout(() => {
+            bScroller.finishPullUp();
+            clearTimeout(timer1);
+            timer1 = null;
+          }, finishDelay);
+
+          timer2 = setTimeout(() => {
+            setBeforePullUp(true);
+            clearTimeout(timer2);
+            timer2 = null;
+          }, updateStateDelay);
+        }
       }
     },
     [bScroller]
@@ -35,43 +49,49 @@ export default function usePullUp(
 
   const pullingUpHandler = useCallback(async () => {
     console.log('trigger pullUp');
-    if (handlePullUpLoad) {
-      const judgeAsync = isAsync(handlePullUpLoad);
+    if (pullUpHandler) {
       setBeforePullUp(false);
-      setIsPullUpLoad(true);
+      setIsPullingUp(true);
 
-      if (judgeAsync) {
-        // handlePullUpLoad 是 async 函数，函数执行完，自动结束刷新
-        // handlePullUpLoad 是 async 函数时，handlePullUpLoad 方法不会接受 finish 函数为参数
-        console.log('async callback');
-        try {
-          await handlePullUpLoad();
-          finish(false);
-        } catch {
-          finish(true);
+      try {
+        const judgeAsync = isAsync(pullUpHandler);
+        if (judgeAsync) {
+          console.log('async callback');
+          // pullUpHandler 是 async 函数，函数执行完，自动结束刷新
+          // pullUpHandler 是 async 函数时，handlePullUpLoad 方法不会接受 finish 函数为参数
+          const res = await (pullUpHandler as AsyncPullingHandler )();
+          if (res) {
+            finish(res);
+          } else {
+            finish();
+          }
+        } else {
+          console.log('sync callback');
+          // pullUpHandler 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束刷新
+          (pullUpHandler as SyncPullingHandler )(finish);
         }
-      } else {
-        // handlePullUpLoad 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束上拉加载
-        console.log('sync callback');
-        handlePullUpLoad(finish);
+      } catch (e: any) {
+        finish({ error: true });
+        if (e instanceof Error) throw e;
+        throw new Error(e);
       }
     }
-  }, [finish, handlePullUpLoad]);
+  }, [finish, pullUpHandler]);
 
   useEffect(() => {
     const hasEvent = enablePullUp && bScroller && bScroller.eventTypes.pullingUp;
     if (hasEvent) {
-      console.log('bind pullLoad');
+      console.log('bind pullingUp');
       bScroller.on('pullingUp', pullingUpHandler);
     }
 
     return () => {
       if (hasEvent) {
-        console.log('off pullLoad');
+        console.log('off pullingUp');
         bScroller.off('pullingUp', pullingUpHandler);
       }
     };
   }, [bScroller, enablePullUp, pullingUpHandler]);
 
-  return { beforePullUp, isPullUpLoading, isPullLoadError };
+  return { beforePullUp, isPullingUp, isPullUpError };
 }

@@ -9,7 +9,7 @@ BScroll.use(PullDown);
 BScroll.use(Pullup);
 BScroll.use(ObserveImage);
 
-export default function useScrollController(props: ScrollerProps, el: HTMLElement | string) {
+export default function useScrollController(props: ScrollerProps, el: HTMLElement | string, contentHeight = 0) {
   const bscroller = useRef<ScrollConstructor | null | undefined>();
   const [bScroller, setBScroller] = useState<ScrollConstructor>();
   const { enablePullDown, enablePullUp, observeImg, extraConfig, pullDownConfig, pullUpConfig } = props;
@@ -22,21 +22,25 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
       console.log('init scroll');
       const extraOpt = extraConfig ?? {};
       const baseConfig = {
-        eventPassthrough: 'horizontal',
         click: true,
         stopPropagation: true,
-        useTransition: true,
+        useTransition: false,
         // 下拉刷新配置
         pullDownRefresh: pullDownCon,
         // 上拉加载
         pullUpLoad: pullUpCon,
+        // eventPassthrough: 'horizontal',
+        // preventDefault: true,
+        // probeType: 0,
         ...extraOpt
       };
 
       let conf: typeof baseConfig = { ...baseConfig };
 
-      if (observeImg) conf = { ...conf, observeImage: observeImg };
-
+      if (observeImg) {
+        console.log('using observeImg');
+        conf = { ...conf, observeImage: observeImg };
+      }
       return new BScroll(el, conf);
     },
     [extraConfig, observeImg, pullDownCon, pullUpCon]
@@ -66,7 +70,7 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
       bscroller.current.refresh();
       console.log('refresh bScroller');
     }
-  }, [props.height, props.children]);
+  }, [props.height, contentHeight]);
 
   // 是否开始下拉刷新
   useEffect(() => {

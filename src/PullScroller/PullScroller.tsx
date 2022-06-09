@@ -1,60 +1,69 @@
-import { isValidElement, useMemo, useRef } from 'react';
+import { isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import { usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
 import { ScrollerProps } from './type';
 
 export default function PullScroller(props: ScrollerProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const { refresher, pullLoader, backTop } = props;
+  const container = useRef<HTMLDivElement | null>(null);
+  const [contentHeight, setContentHeight] = useState<number>();
 
-  const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement);
+  const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement, contentHeight);
   const { scrollY, switchBackTop, scrollToTop } = useScrollEvent(bScroller, props);
-  const { beforePullDown, isPullingDown, isRefreshError } = usePullDown(bScroller, props);
-  const { beforePullUp, isPullUpLoading, isPullLoadError } = usePullUp(bScroller, props);
+  const { beforePullDown, isPullingDown, isPullDownError } = usePullDown(bScroller, props);
+  const { beforePullUp, isPullingUp, isPullUpError } = usePullUp(bScroller, props);
+  const { pullDownLoader, pullUpLoader, backTop } = props;
 
-  const showBackTop = useMemo(() => !switchBackTop && scrollY > 300, [scrollY, switchBackTop]);
+  useEffect(() => {
+    // setContentHeight(container.current?.getBoundingClientRect().height);
+    setContentHeight(container.current?.offsetHeight);
+  }, [props.children]);
 
-  const Refrehser = useMemo(() => {
-    if (refresher) {
-      if (isValidElement(refresher) || typeof refresher === 'string') {
-        return refresher;
+  // BackTop show or hide
+  const showBack = useMemo(() => switchBackTop && scrollY > 150, [scrollY, switchBackTop]);
+  const showAlways = useMemo(() => true && scrollY > 150, [scrollY]);
+
+  const Refresher = useMemo(() => {
+    if (pullDownLoader) {
+      if (isValidElement(pullDownLoader)) {
+        return pullDownLoader;
       }
-      if (typeof refresher === 'function') {
+      if (typeof pullDownLoader === 'function') {
         try {
-          return refresher({ beforePullDown, isPullingDown, isRefreshError });
+          return pullDownLoader({ beforePullDown, isPullingDown, isPullDownError });
         } catch {
           return null;
         }
       }
       return null;
     }
-    return null;
-  }, [beforePullDown, isPullingDown, isRefreshError, refresher]);
+    return <div style={{ padding: 13, textAlign: 'center' }}>Loading...</div>;
+  }, [beforePullDown, isPullDownError, isPullingDown, pullDownLoader]);
 
-  const PullLoader = useMemo(() => {
-    if (pullLoader) {
-      if (isValidElement(pullLoader) || typeof pullLoader === 'string') {
-        return pullLoader;
+  const PullUpLoader = useMemo(() => {
+    if (pullUpLoader) {
+      if (isValidElement(pullUpLoader) || typeof pullUpLoader === 'string') {
+        return pullUpLoader;
       }
-      if (typeof pullLoader === 'function') {
+      if (typeof pullUpLoader === 'function') {
         try {
-          return pullLoader({ beforePullUp, isPullUpLoading, isPullLoadError });
+          return pullUpLoader({ beforePullUp, isPullingUp, isPullUpError });
         } catch {
           return null;
         }
       }
       return null;
     }
-    return null;
-  }, [beforePullUp, isPullLoadError, isPullUpLoading, pullLoader]);
+    return <div style={{ padding: 13, textAlign: 'center' }}>Loading...</div>;
+  }, [beforePullUp, isPullUpError, isPullingUp, pullUpLoader]);
 
   const BackToper = useMemo(() => {
     if (backTop) {
-      if (isValidElement(backTop) || typeof backTop === 'string') {
+      if (isValidElement(backTop)) {
         return backTop;
       }
       if (typeof backTop === 'function') {
         try {
-          return backTop({ handleScrollToTop: scrollToTop, show: showBackTop });
+          return backTop({ handleScrollToTop: scrollToTop, show: showBack, showAlways });
         } catch {
           return null;
         }
@@ -62,7 +71,7 @@ export default function PullScroller(props: ScrollerProps) {
       return null;
     }
     return null;
-  }, [backTop, scrollToTop, showBackTop]);
+  }, [backTop, scrollToTop, showAlways, showBack]);
 
   return (
     <div
@@ -78,44 +87,19 @@ export default function PullScroller(props: ScrollerProps) {
               position: 'absolute',
               width: '100%',
               boxSizing: 'border-box',
-              transform: 'translateY(-100%) translateZ(0)'
+              transform: 'translateY(-100%) translateZ(0)',
+              overflow: 'hidden'
             }}
           >
-            {Refrehser ? Refrehser : <div style={{ textAlign: 'center', color: '#999' }}>Loading...</div>}
+            {Refresher}
           </div>
         ) : null}
-        {props.children}
-        {props.enablePullUp ? (
-          <div className="pullup__wrapper">
-            {PullLoader ? (
-              PullLoader
-            ) : (
-              <div style={{ padding: 15, textAlign: 'center', color: '#999' }}>Loading...</div>
-            )}
-          </div>
-        ) : null}
+        <div ref={container} className="scroller">
+          {props.children}
+        </div>
+        {props.enablePullUp ? <div className="pullup__wrapper">{PullUpLoader}</div> : null}
       </div>
-      {props.enableBackTop ? (
-        <>
-          {BackToper ? (
-            BackToper
-          ) : (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 50,
-                right: 10,
-                width: 50,
-                height: 50,
-                display: showBackTop ? undefined : 'none'
-              }}
-              onClick={scrollToTop}
-            >
-              Top
-            </div>
-          )}
-        </>
-      ) : null}
+      {BackToper}
     </div>
   );
 }

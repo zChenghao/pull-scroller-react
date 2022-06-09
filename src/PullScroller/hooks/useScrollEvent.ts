@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
-import { BScrollConstructor } from '@better-scroll/core/dist/types/BScroll';
 import { debounce, throttle } from '../utils/utils';
-import { ScrollProps } from '../type';
+import { ScrollConstructor, ScrollProps } from '../type';
 
 /* ============ 滚动事件相关 ============ */
 
-export default function useScrollEvent(bScroller: BScrollConstructor | undefined, props: ScrollProps) {
+export default function useScrollEvent(bScroller: ScrollConstructor | undefined | null, props: ScrollProps) {
   const [scrollY, setScrollY] = useState(0);
-  const [switchBackTop, setSwitchBackTop] = useState(false);
-  const { handleScroll, enableBackTop } = props;
+  const [switchBackTop, setSwitchBackTop] = useState(true);
+  const { handleScroll, backTop } = props;
 
   // 计算 Y轴 滚动距离
   const calcScrollY = (y: number) => {
@@ -30,17 +29,16 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
   const scroll = useCallback(
     (pos) => {
       updateScrollY(pos.y);
-      setSwitchBackTop(true);
+      setSwitchBackTop(false);
       const scrollY = calcScrollY(pos.y);
       if (handleScroll) {
         handleScroll(scrollY);
       }
     },
-    [handleScroll]
+    [handleScroll, updateScrollY]
   );
 
   // 回到顶部
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const scrollToTop = useCallback(
     debounce(() => {
       bScroller?.scrollTo(0, 0, 300, undefined);
@@ -49,29 +47,28 @@ export default function useScrollEvent(bScroller: BScrollConstructor | undefined
   );
 
   useEffect(() => {
-    const scroller = bScroller?.scroller;
+    const scroller = bScroller?.scroller.hooks;
+    const hasEvent = scroller && (handleScroll || backTop);
 
     const move = throttle(scroll, 50);
-
     const scrollEnd = (pos) => {
-      setSwitchBackTop(false);
+      setSwitchBackTop(true);
       updateScrollY(pos.y);
     };
 
-    if (scroller && (handleScroll || enableBackTop)) {
-      if (enableBackTop) setSwitchBackTop(false);
+    if (hasEvent) {
       console.log('bind scroll');
-      scroller.hooks.on('scroll', move);
-      scroller.hooks.on('scrollEnd', scrollEnd);
+      scroller.on('scroll', move);
+      scroller.on('scrollEnd', scrollEnd);
     }
     return () => {
-      if (handleScroll || enableBackTop) {
+      if (hasEvent) {
         console.log('off scroll');
-        if (scroller?.hooks.eventTypes.scroll) scroller.hooks.off('scroll', move);
-        if (scroller?.hooks.eventTypes.scrollEnd) scroller.hooks.off('scrollEnd', scrollEnd);
+        if (scroller.eventTypes.scroll) scroller.off('scroll', move);
+        if (scroller.eventTypes.scrollEnd) scroller.off('scrollEnd', scrollEnd);
       }
     };
-  }, [bScroller, enableBackTop, handleScroll, scroll, updateScrollY]);
+  }, [bScroller, backTop, handleScroll, scroll, updateScrollY]);
 
   return { scrollY, switchBackTop, scrollToTop };
 }

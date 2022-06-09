@@ -5,13 +5,13 @@ module.exports = {
   mode: 'production',
   entry: {
     index: './src/index.ts',
-    components: {
-      import:'./src/PullScroller/components/index.ts',
-      filename:'PullScroller/components/index.js'
-    }
+    // components: {
+    //   import:'./src/PullScroller/components/index.ts',
+    //   filename:'PullScroller/components/index.js'
+    // }
   },
   output: {
-    filename: '[name].js',
+    filename: 'index.js',
     path: path.resolve(__dirname, 'dist'),
     library: {
       name: 'PullScroller',
@@ -28,15 +28,15 @@ module.exports = {
         commonjs2: 'react',
         amd: 'react',
         root: 'React'
+      },
+      '@better-scroll/core':{
+        commonjs: '@better-scroll/core',
+        commonjs2: '@better-scroll/core',
+        amd: '@better-scroll/core',
+        root: 'BScroll'
       }
-      // 'react-dom': {
-      //   commonjs: 'react-dom',
-      //   commonjs2: 'react-dom',
-      //   amd: 'react-dom',
-      //   root: 'ReactDOM'
-      // }
     },
-    '@better-scroll/core',
+    // '@better-scroll/core',
     '@better-scroll/pull-down',
     '@better-scroll/pull-up',
     '@better-scroll/observe-image'
