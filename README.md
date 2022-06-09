@@ -1,6 +1,6 @@
 # pull-scroller-react v1.3.x
 
-[Demos](https://github.com/zChenghao/demos-pull-scroller-react)
+[Demos](https://github.com/zChenghao/demos-pull-scroller-react/tree/demo_v1.3.x)
 
 ## Introduction
 
