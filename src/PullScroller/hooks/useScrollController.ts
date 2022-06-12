@@ -13,7 +13,10 @@ export default function useScrollController(props: ScrollerProps, el: HTMLElemen
   const bscroller = useRef<ScrollConstructor | null | undefined>();
   const [bScroller, setBScroller] = useState<ScrollConstructor>();
   const { enablePullDown, enablePullUp, observeImg, extraConfig, pullDownConfig, pullUpConfig } = props;
-  const pullDownCon = useMemo(() => pullDownConfig ?? true, [pullDownConfig]);
+  const pullDownCon = useMemo(
+    () => (pullDownConfig === true ? pullDownConfig : { threshold: 90, stop: 40, ...pullDownConfig }),
+    [pullDownConfig]
+  );
   const pullUpCon = useMemo(() => pullUpConfig ?? true, [pullUpConfig]);
 
   // 初始化滚动方法

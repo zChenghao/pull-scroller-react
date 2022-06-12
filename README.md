@@ -209,6 +209,36 @@ function PullLoadDemo() {
   );
 ```
 
+### Set horizontal scrolling
+
+PullScroller only handles vertical scrolling and does not handle horizontal scrolling. If you want the page to scroll horizontally as well, you can set `{ eventPassthrough: 'horizontal' }` to make horizontal scrolling use native scrolling.  
+
+Example:
+
+```javascript
+function App() {
+  const [list, setList] = useState<ListItem[]>([]);
+  const { windowHeight } = useWindowHeight();
+  const config = useMemo(() =>({ eventPassthrough: 'horizontal' }),[]);
+
+  useEffect(() => {
+    mockGetListData(0, 50)
+      .then((res) => {
+        setList(res);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  }, []);
+
+  return (
+    <PullScroller height={windowHeight} extraConfig={config}>
+      <DemoList list={list} />
+    </PullScroller>
+  );
+}
+```
+
 ## Problems that may be encountered in use
 
 + When the page has `<img />`.It is possible that the page has been rendered but the image has not been loaded.The PullScoller component is unable to monitor picture loading completion,so after the image is loaded, refresh() is not triggered,this may causes problems with page scrolling.  
@@ -339,6 +369,27 @@ You can solve the problem like this:
     );
   }
 ```
+
++ The page has elements with `fixed` positioning.  
+If a fixed positioned element is placed inside a scroll, fixed will fail because better-scroll uses transalate to simulate scrolling. So you should place the fixed element outside the PullScroller.
+
+```javascript
+function App() {
+
+  // ...
+  
+  return (
+    <>
+      <div className="fixed">fixed</div>
+      <PullScroller height={windowHeight}>
+        <div>content</div>
+      </PullScroller>
+    </>
+  )
+}
+```
+
+[There is an example of a fixed tabbar.](https://github.com/zChenghao/demos-pull-scroller-react/blob/main/src/page/FixedTab/FixedTab.tsx)
 
 ## Props
 
@@ -481,7 +532,8 @@ Source code:
 ```
 
 + pullDownConfig: pull-down config. When using custom refresh component this parameter may be required. Default value
-is `{ threshold: 90, stop: 40 }` (threshold: the distance from the top drop-down to trigger the refresh, stop: rebound hover distance).  
+is `true` (`= { threshold: 90, stop: 40 }`) ({ threshold?: number; stop?: number })  
+threshold: the distance from the top drop-down to trigger the refresh, stop: rebound hover distance.  
 You must define this value using either `useMemo` or `useState`, because this configuration accepts an object (the value of the reference type). If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to scroll.  
 
 So you define the configuration like this
@@ -737,7 +789,7 @@ export interface ScrollProps {
   readonly pullDownHandler?: SyncPullingHandler | AsyncPullingHandler; // pullDown handler
   readonly pullDownLoader?: PullDownMaker | ReactNode; // refresh component
   // pull down config. When using custom refresh component this parameter may be required
-  readonly pullDownConfig?: true | { threshold: number; stop: number }; // default: true = {threshold: 90, stop: 40}
+  readonly pullDownConfig?: true | { threshold?: number; stop?: number }; // default: true = {threshold: 90, stop: 40}
   // PullUp
   readonly enablePullUp?: boolean; // enable pullup (load more)
   readonly pullUpHandler?: SyncPullingHandler | AsyncPullingHandler; // pullUp handler

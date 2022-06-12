@@ -53,7 +53,7 @@ export interface ScrollProps {
   readonly pullDownHandler?: SyncPullingHandler | AsyncPullingHandler; // pullDown handler
   readonly pullDownLoader?: PullDownMaker | ReactNode; // refresh component
   // pull down config. When using custom refresh component this parameter may be required
-  readonly pullDownConfig?: true | { threshold: number; stop: number }; // default: true = {threshold: 90, stop: 40}
+  readonly pullDownConfig?: true | { threshold?: number; stop?: number }; // default: true = {threshold: 90, stop: 40}
   // PullUp
   readonly enablePullUp?: boolean; // enable pullup (load more)
   readonly pullUpHandler?: SyncPullingHandler | AsyncPullingHandler; // pullUp handler
