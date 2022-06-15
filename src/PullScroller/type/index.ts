@@ -80,3 +80,33 @@ export interface PluginAPI {
 }
 
 export type ScrollConstructor = BScrollConstructor & PluginAPI;
+
+export interface EaseItem {
+  style: string;
+  fn: (t: number) => number;
+}
+
+export interface ExposedMethodsRef {
+  refresh(): void;
+  stop(): void;
+  enable(): void;
+  disable(): void;
+  scrollTo(
+    x: number,
+    y: number,
+    time?: number,
+    easing?: EaseItem,
+    extraTransform?: {
+      start: object;
+      end: object;
+    }
+  ): void;
+  scrollBy(deltaX: number, deltaY: number, time?: number, easing?: EaseItem): void;
+  scrollToElement(
+    el: HTMLElement | string,
+    time: number,
+    offsetX: number | boolean,
+    offsetY: number | boolean,
+    easing?: EaseItem
+  ): void;
+}

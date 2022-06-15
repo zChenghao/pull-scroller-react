@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { isAsync } from '../utils/utils';
-import { ScrollProps, ScrollConstructor, FinishState, PullUpState, AsyncPullingHandler, SyncPullingHandler } from '../type';
+import {
+  ScrollProps,
+  ScrollConstructor,
+  FinishState,
+  PullUpState,
+  AsyncPullingHandler,
+  SyncPullingHandler
+} from '../type';
 
-export default function usePullUp(
+export function usePullUp(
   bScroller: ScrollConstructor | undefined | null,
   { enablePullUp, pullUpHandler }: ScrollProps
 ): PullUpState {
@@ -59,7 +66,7 @@ export default function usePullUp(
           console.log('async callback');
           // pullUpHandler 是 async 函数，函数执行完，自动结束刷新
           // pullUpHandler 是 async 函数时，handlePullUpLoad 方法不会接受 finish 函数为参数
-          const res = await (pullUpHandler as AsyncPullingHandler )();
+          const res = await (pullUpHandler as AsyncPullingHandler)();
           if (res) {
             finish(res);
           } else {
@@ -68,7 +75,7 @@ export default function usePullUp(
         } else {
           console.log('sync callback');
           // pullUpHandler 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束刷新
-          (pullUpHandler as SyncPullingHandler )(finish);
+          (pullUpHandler as SyncPullingHandler)(finish);
         }
       } catch (e: any) {
         finish({ error: true });

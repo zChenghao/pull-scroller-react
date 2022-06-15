@@ -4,7 +4,7 @@ import { ScrollConstructor, ScrollProps } from '../type';
 
 /* ============ 滚动事件相关 ============ */
 
-export default function useScrollEvent(bScroller: ScrollConstructor | undefined | null, props: ScrollProps) {
+export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, props: ScrollProps) {
   const [scrollY, setScrollY] = useState(0);
   const [switchBackTop, setSwitchBackTop] = useState(true);
   const { handleScroll, backTop } = props;

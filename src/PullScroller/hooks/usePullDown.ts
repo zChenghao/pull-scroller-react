@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 import { isAsync } from '../utils/utils';
-import { AsyncPullingHandler, FinishState, PullDownState, ScrollConstructor, ScrollProps, SyncPullingHandler } from '../type';
+import {
+  AsyncPullingHandler,
+  FinishState,
+  PullDownState,
+  ScrollConstructor,
+  ScrollProps,
+  SyncPullingHandler
+} from '../type';
 
-export default function usePullDown(
+export function usePullDown(
   bScroller: ScrollConstructor | undefined | null,
   { enablePullDown, pullDownHandler }: ScrollProps
 ): PullDownState {
@@ -66,7 +73,7 @@ export default function usePullDown(
         } else {
           console.log('sync callback');
           // pullDownHandler 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束刷新
-          (pullDownHandler as SyncPullingHandler )(finish);
+          (pullDownHandler as SyncPullingHandler)(finish);
         }
       } catch (e: any) {
         finish({ error: true });

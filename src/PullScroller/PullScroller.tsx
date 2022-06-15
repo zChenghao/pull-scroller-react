@@ -1,17 +1,31 @@
-import { isValidElement, useEffect, useMemo, useRef, useState } from 'react';
-import { usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
-import { ScrollerProps } from './type';
+import { forwardRef, isValidElement, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useExposed, usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
+import { ScrollerProps, ExposedMethodsRef } from './type';
 
-export default function PullScroller(props: ScrollerProps) {
+// export default function PullScroller(props: ScrollerProps) {}
+const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullScroller(props, ref) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const container = useRef<HTMLDivElement | null>(null);
   const [contentHeight, setContentHeight] = useState<number>();
-
+  const { pullDownLoader, pullUpLoader, backTop } = props;
   const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement, contentHeight);
   const { scrollY, switchBackTop, scrollToTop } = useScrollEvent(bScroller, props);
   const { beforePullDown, isPullingDown, isPullDownError } = usePullDown(bScroller, props);
   const { beforePullUp, isPullingUp, isPullUpError } = usePullUp(bScroller, props);
-  const { pullDownLoader, pullUpLoader, backTop } = props;
+  const methods = useExposed(bScroller);
+
+  useImperativeHandle(ref, () => methods, [methods]);
+  
+  // const { refresh, stop, scrollTo, scrollBy, scrollToElement, enable, disable } = useExposed(bScroller);
+  // useImperativeHandle(ref, () => ({ refresh, stop, scrollTo, scrollBy, scrollToElement, enable, disable }), [
+  //   disable,
+  //   enable,
+  //   refresh,
+  //   scrollBy,
+  //   scrollTo,
+  //   scrollToElement,
+  //   stop
+  // ]);
 
   useEffect(() => {
     // setContentHeight(container.current?.getBoundingClientRect().height);
@@ -19,8 +33,8 @@ export default function PullScroller(props: ScrollerProps) {
   }, [props.children]);
 
   // BackTop show or hide
-  const showBack = useMemo(() => switchBackTop && scrollY > 150, [scrollY, switchBackTop]);
-  const showAlways = useMemo(() => true && scrollY > 150, [scrollY]);
+  const showBack = useMemo(() => switchBackTop && scrollY > 100, [scrollY, switchBackTop]);
+  const showAlways = useMemo(() => true && scrollY > 100, [scrollY]);
 
   const Refresher = useMemo(() => {
     if (pullDownLoader) {
@@ -41,7 +55,7 @@ export default function PullScroller(props: ScrollerProps) {
 
   const PullUpLoader = useMemo(() => {
     if (pullUpLoader) {
-      if (isValidElement(pullUpLoader) || typeof pullUpLoader === 'string') {
+      if (isValidElement(pullUpLoader)) {
         return pullUpLoader;
       }
       if (typeof pullUpLoader === 'function') {
@@ -76,13 +90,13 @@ export default function PullScroller(props: ScrollerProps) {
   return (
     <div
       ref={scrollRef}
-      className="loadscroll__wrapper"
+      className="pull_scroller"
       style={{ position: 'relative', overflowY: 'hidden', height: props.height || '100%' }}
     >
       <div>
         {props.enablePullDown ? (
           <div
-            className="pulldown__wrapper"
+            className="pulldown"
             style={{
               position: 'absolute',
               width: '100%',
@@ -97,9 +111,11 @@ export default function PullScroller(props: ScrollerProps) {
         <div ref={container} className="scroller">
           {props.children}
         </div>
-        {props.enablePullUp ? <div className="pullup__wrapper">{PullUpLoader}</div> : null}
+        {props.enablePullUp ? <div className="pullup">{PullUpLoader}</div> : null}
       </div>
       {BackToper}
     </div>
   );
-}
+});
+
+export default PullScroller;

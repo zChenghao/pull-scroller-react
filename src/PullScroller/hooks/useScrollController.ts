@@ -9,7 +9,7 @@ BScroll.use(PullDown);
 BScroll.use(Pullup);
 BScroll.use(ObserveImage);
 
-export default function useScrollController(props: ScrollerProps, el: HTMLElement | string, contentHeight = 0) {
+export function useScrollController(props: ScrollerProps, el: HTMLElement | string, contentHeight = 0) {
   const bscroller = useRef<ScrollConstructor | null | undefined>();
   const [bScroller, setBScroller] = useState<ScrollConstructor>();
   const { enablePullDown, enablePullUp, observeImg, extraConfig, pullDownConfig, pullUpConfig } = props;

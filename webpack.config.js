@@ -4,7 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = {
   mode: 'production',
   entry: {
-    index: './src/index.ts',
+    index: './src/index.ts'
     // components: {
     //   import:'./src/PullScroller/components/index.ts',
     //   filename:'PullScroller/components/index.js'
@@ -29,7 +29,7 @@ module.exports = {
         amd: 'react',
         root: 'React'
       },
-      '@better-scroll/core':{
+      '@better-scroll/core': {
         commonjs: '@better-scroll/core',
         commonjs2: '@better-scroll/core',
         amd: '@better-scroll/core',
@@ -51,7 +51,8 @@ module.exports = {
           },
           format: {
             comments: false
-          }
+          },
+          // keep_fnames: true
         },
         extractComments: false
       })

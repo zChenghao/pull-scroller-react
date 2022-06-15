@@ -1,4 +1,4 @@
-# pull-scroller-react v1.4.x
+# pull-scroller-react v1.5.x
 
 [1.3.x Docs](https://github.com/zChenghao/pull-scroller-react/tree/v1.3.x)
 
@@ -237,6 +237,28 @@ function App() {
     </PullScroller>
   );
 }
+```
+
+### Use exposed instance methods(added in version 1.5.x)
+
+```javascript
+  // using in typescript 
+  function App() {
+    const scroller = useRef<ScrollRefProps>(null);
+
+    useEffect(() => {
+      scroller.current?.refresh()
+    }, [])
+
+    return (
+       <LoadScroll
+        ref={scroller}
+      >
+        <List list={list} />
+      </LoadScroll>
+    )
+  }
+
 ```
 
 ## Problems that may be encountered in use
@@ -721,6 +743,42 @@ Ddefault configuration:
     pullDownRefresh: pullDownCon,
     pullUpLoad: pullUpCon,
   };
+```
+
+## Exposed methods(add in v1.5.x)
+
+Version 1.5.x exposes some instance methods. You can call them to implement some features.How to use these methods can be found in this [document](https://better-scroll.github.io/docs/en-US/guide/base-scroll-api.html#methods)
+
+```typescript
+interface ExposedMethodsRef {
+  refresh(): void;
+  stop(): void;
+  enable(): void;
+  disable(): void;
+  scrollTo(
+    x: number,
+    y: number,
+    time?: number,
+    easing?: EaseItem,
+    extraTransform?: {
+      start: object;
+      end: object;
+    }
+  ): void;
+  scrollBy(deltaX: number, deltaY: number, time?: number, easing?: EaseItem): void;
+  scrollToElement(
+    el: HTMLElement | string,
+    time: number,
+    offsetX: number | boolean,
+    offsetY: number | boolean,
+    easing?: EaseItem
+  ): void;
+}
+
+interface EaseItem {
+  style: string;
+  fn: (t: number) => number;
+}
 ```
 
 ## Deprecated props
