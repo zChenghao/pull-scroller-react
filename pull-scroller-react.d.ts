@@ -3,8 +3,65 @@ declare module 'pull-scroller-react' {
   import { BScrollConstructor } from '@better-scroll/core/dist/types/BScroll';
   import { PullDownRefreshOptions } from '@better-scroll/pull-down';
   import { PullUpLoadOptions } from '@better-scroll/pull-up';
-
-  interface BScrollPluginAPI {
+  import { ObserveImageOptions } from '@better-scroll/observe-image';
+  import { Options } from '@better-scroll/core';
+  
+  export interface PullDownState {
+    beforePullDown: boolean;
+    isPullingDown: boolean;
+    isPullDownError: boolean;
+  }
+  
+  export interface PullUpState {
+    beforePullUp: boolean;
+    isPullingUp: boolean;
+    isPullUpError: boolean;
+  }
+  
+  export interface BackTopProps {
+    handleScrollToTop: () => void;
+    show: boolean;
+    showAlways: boolean;
+  }
+  
+  export type PullDownMaker = (props: PullDownState) => ReactNode;
+  export type PullUpMaker = (props: PullUpState) => ReactNode;
+  export type BackTopMaker = (props: BackTopProps) => ReactNode;
+  
+  export interface FinishState {
+    delay?: number;
+    error?: boolean;
+    immediately?: boolean;
+  }
+  
+  export type FinishHanlder = (state?: FinishState) => void;
+  export type SyncPullingHandler = (complete: FinishHanlder) => void;
+  export type AsyncPullingHandler = () => Promise<void | FinishState>;
+  
+  export interface ScrollProps {
+    readonly height?: string; // Height of scrolling area.The default value is '100%'
+    readonly handleScroll?: (scrollY: number) => void; // custom scroll event
+    // PullDown
+    readonly enablePullDown?: boolean; // enable pulldown (refresh)
+    readonly pullDownHandler?: SyncPullingHandler | AsyncPullingHandler; // pullDown handler
+    readonly pullDownLoader?: PullDownMaker | ReactNode; // refresh component
+    // pull down config. When using custom refresh component this parameter may be required
+    readonly pullDownConfig?: true | { threshold?: number; stop?: number }; // default: true = {threshold: 90, stop: 40}
+    // PullUp
+    readonly enablePullUp?: boolean; // enable pullup (load more)
+    readonly pullUpHandler?: SyncPullingHandler | AsyncPullingHandler; // pullUp handler
+    readonly pullUpLoader?: PullUpMaker | ReactNode; // load more component
+    // pull up config. When using custom load more component this parameter may be required
+    readonly pullUpConfig?: true | { threshold: number }; // Threshold for triggering the pull-up event,default:true = {threshold:0}
+  
+    readonly backTop?: BackTopMaker | ReactNode; // back top element
+    readonly observeImg?: ObserveImageOptions;
+    readonly extraConfig?: Options;
+  }
+  
+  export type ScrollerProps = PropsWithChildren<ScrollProps>;
+  
+  export interface PluginAPI {
     finishPullDown(): void;
     openPullDown(config?: PullDownRefreshOptions): void;
     closePullDown(): void;
@@ -14,50 +71,36 @@ declare module 'pull-scroller-react' {
     closePullUp(): void;
     autoPullUpLoad(): void;
   }
-
-  export interface RefresherProps {
-    beforePullDown: boolean;
-    isPullingDown: boolean;
-    isRefreshError: boolean;
+  
+  export type ScrollConstructor = BScrollConstructor & PluginAPI;
+  
+  export interface EaseItem {
+    style: string;
+    fn: (t: number) => number;
   }
-  export interface PullLoaderProps {
-    beforePullUp: boolean;
-    isPullUpLoading: boolean;
-    isPullLoadError: boolean;
+  
+  export interface ExposedMethodsRef {
+    refresh(): void;
+    stop(): void;
+    enable(): void;
+    disable(): void;
+    scrollTo(
+      x: number,
+      y: number,
+      time?: number,
+      easing?: EaseItem,
+      extraTransform?: {
+        start: object;
+        end: object;
+      }
+    ): void;
+    scrollBy(deltaX: number, deltaY: number, time?: number, easing?: EaseItem): void;
+    scrollToElement(
+      el: HTMLElement | string,
+      time: number,
+      offsetX: number | boolean,
+      offsetY: number | boolean,
+      easing?: EaseItem
+    ): void;
   }
-  export interface BackTopProps {
-    handleScrollToTop: () => void;
-    show: boolean;
-  }
-  export type RefresherMaker = (props: RefresherProps) => ReactNode;
-  export type PullLoaderMaker = (props: PullLoaderProps) => ReactNode;
-  export type BackToperMaker = (props: BackTopProps) => ReactNode;
-
-  export interface ScrollProps {
-    readonly height?: string; // Height of scrolling area.The default value is '100%'
-    readonly enablePullDown?: boolean; // enable pulldown (refresh)
-    readonly enablePullUp?: boolean; // enable pullup (load more)
-    readonly enableBackTop?: boolean; // enable back top
-    // pull down config. When using custom refresh component this parameter may be required
-    readonly pullDownConfig?: {
-      threshold: number; // The distance from the top drop-down to trigger the refresh. The default value is 100
-      stop: number; // Rebound hover distance. The default value is 50
-    };
-    // pull up config. When using custom load more component this parameter may be required
-    readonly pullUpConfig?: {
-      threshold: number; // Threshold for triggering the pull-up event.The default value is 0
-    };
-    readonly handleScroll?: (scrollY: number) => void; // custom scroll event
-    readonly handleRefresh?: (complete?: () => void) => void | Promise<any>; // refresh handler
-    readonly handlePullUpLoad?: (complete?: () => void) => void | Promise<any>; // pull up load handler
-    readonly refresher?: RefresherMaker | ReactNode; // custom refresh component
-    readonly pullLoader?: PullLoaderMaker | ReactNode; // custom load more component
-    readonly backTop?: BackToperMaker | ReactNode; // custom return back top component
-    readonly isPreventDefault?: boolean; // Whether to block browser default behavior
-  }
-
-  export type ScrollerProps = PropsWithChildren<ScrollProps>;
-  export type ScrollConstructor = BScrollConstructor & BScrollPluginAPI;
-
-  export default function PullScroller(props: ScrollerProps): JSX.Element;
 }
