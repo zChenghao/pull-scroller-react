@@ -558,7 +558,7 @@ is `true` (`= { threshold: 90, stop: 40 }`) ({ threshold?: number; stop?: number
 threshold: the distance from the top drop-down to trigger the refresh, stop: rebound hover distance.  
 You must define this value using either `useMemo` or `useState`, because this configuration accepts an object (the value of the reference type). If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal),this may cause the page to be unable to scroll.  
 
-So you define the configuration like this
+So you can define the configuration like this
 
 ```javascript
   const pullDownConfig = useMemo(() => ({ threshold: 100, stop: 60 }), []); // Recommend
@@ -705,7 +705,7 @@ source code
 + pullUpConfig: pull-up config. Default value is { threshold: 0 }(threshold: threshold for triggering the pull-up event, default is 0, you can set it to whatever value you want).  
 You must define this value using either `useMemo` or `useState`, because this configuration accepts an object (the value of the reference type).If you pass objects directly into the component,each status update causes this value to be reassigned(the object references are not equal), this may cause the page to be unable to scroll.  
 
-So you define the configuration like this
+So you can define the configuration like this
 
 ```javascript
   const pullUpConfig = useMemo(() => ({ threshold: 50 }), []); // recommend

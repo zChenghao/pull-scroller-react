@@ -1,7 +1,7 @@
 {
   "name": "pull-scroller-react",
   "sideEffects": false,
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A scroll component based on React and Better-Scroll for mobile web app",
   "main": "dist/index.js",
   "scripts": {

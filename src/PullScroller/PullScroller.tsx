@@ -15,17 +15,6 @@ const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullS
   const methods = useExposed(bScroller);
 
   useImperativeHandle(ref, () => methods, [methods]);
-  
-  // const { refresh, stop, scrollTo, scrollBy, scrollToElement, enable, disable } = useExposed(bScroller);
-  // useImperativeHandle(ref, () => ({ refresh, stop, scrollTo, scrollBy, scrollToElement, enable, disable }), [
-  //   disable,
-  //   enable,
-  //   refresh,
-  //   scrollBy,
-  //   scrollTo,
-  //   scrollToElement,
-  //   stop
-  // ]);
 
   useEffect(() => {
     // setContentHeight(container.current?.getBoundingClientRect().height);
@@ -108,7 +97,7 @@ const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullS
             {Refresher}
           </div>
         ) : null}
-        <div ref={container} className="scroller">
+        <div ref={container} className="pull_container">
           {props.children}
         </div>
         {props.enablePullUp ? <div className="pullup">{PullUpLoader}</div> : null}
