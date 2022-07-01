@@ -2,7 +2,6 @@ import { forwardRef, isValidElement, useEffect, useImperativeHandle, useMemo, us
 import { useExposed, usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
 import { ScrollerProps, ExposedMethodsRef } from './type';
 
-// export default function PullScroller(props: ScrollerProps) {}
 const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullScroller(props, ref) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const container = useRef<HTMLDivElement | null>(null);

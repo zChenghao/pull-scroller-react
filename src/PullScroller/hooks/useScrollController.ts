@@ -37,14 +37,9 @@ export function useScrollController(props: ScrollerProps, el: HTMLElement | stri
         // probeType: 0,
         ...extraOpt
       };
-
-      let conf: typeof baseConfig = { ...baseConfig };
-
-      if (observeImg) {
-        console.log('using observeImg');
-        conf = { ...conf, observeImage: observeImg };
-      }
-      return new BScroll(el, conf);
+      // let conf: typeof baseConfig = { ...baseConfig };
+      if (observeImg) return new BScroll(el, { ...baseConfig, observeImage: observeImg });
+      return new BScroll(el, baseConfig);
     },
     [extraConfig, observeImg, pullDownCon, pullUpCon]
   );

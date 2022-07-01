@@ -6,7 +6,7 @@
 
 ## Introduction
 
-A scroll component based on React and Better-Scroll for mobile web app.
+A H5 mobile scrolling component developed based on React and Better-Scroll supports pull-down refreshing and pull-up loading, and supports custom pull-down components and pull-up components.
 
 ## Installation
 
