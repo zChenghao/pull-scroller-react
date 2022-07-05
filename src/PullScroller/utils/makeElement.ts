@@ -1,11 +1,11 @@
 import { isValidElement, ReactNode } from 'react';
 import { BackTopMaker, PullDownMaker, PullUpMaker } from '../type';
 
-export function makeUI(maker: ReactNode | PullDownMaker | PullUpMaker | BackTopMaker, states) {
+export function makeElement(maker: ReactNode | PullDownMaker | PullUpMaker | BackTopMaker, props) {
   if (isValidElement(maker)) return maker;
   if (typeof maker === 'function') {
     try {
-      return maker(states);
+      return maker(props);
     } catch {
       return null;
     }

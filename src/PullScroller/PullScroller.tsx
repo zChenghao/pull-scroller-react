@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useExposed, usePullDown, usePullUp, useScrollController, useScrollEvent } from './hooks';
-import { makeUI } from './utils/makeUI';
+import { makeElement } from './utils/makeElement';
 import { ScrollerProps, ExposedMethodsRef } from './type';
 
 const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullScroller(props, ref) {
@@ -26,17 +26,17 @@ const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullS
   const showAlways = useMemo(() => scrollY > 100, [scrollY]);
 
   const Refresher = useMemo(() => {
-    if (pullDownLoader) return makeUI(pullDownLoader, { beforePullDown, isPullingDown, isPullDownError });
+    if (pullDownLoader) return makeElement(pullDownLoader, { beforePullDown, isPullingDown, isPullDownError });
     return <div style={{ padding: 13, textAlign: 'center' }}>Loading...</div>;
   }, [beforePullDown, isPullDownError, isPullingDown, pullDownLoader]);
 
   const PullUpLoader = useMemo(() => {
-    if (pullUpLoader) return makeUI(pullUpLoader, { beforePullUp, isPullingUp, isPullUpError });
+    if (pullUpLoader) return makeElement(pullUpLoader, { beforePullUp, isPullingUp, isPullUpError });
     return <div style={{ padding: 13, textAlign: 'center' }}>Loading...</div>;
   }, [beforePullUp, isPullUpError, isPullingUp, pullUpLoader]);
 
   const BackToper = useMemo(() => {
-    if (backTop) return makeUI(backTop, { handleScrollToTop: scrollToTop, show: showBack, showAlways });
+    if (backTop) return makeElement(backTop, { handleScrollToTop: scrollToTop, show: showBack, showAlways });
     return null;
   }, [backTop, scrollToTop, showAlways, showBack]);
 
