@@ -68,7 +68,7 @@ export interface ScrollProps {
 
 export type ScrollerProps = PropsWithChildren<ScrollProps>;
 
-export interface PluginAPI {
+export interface ScrollConstructor extends BScrollConstructor {
   finishPullDown(): void;
   openPullDown(config?: PullDownRefreshOptions): void;
   closePullDown(): void;
@@ -78,8 +78,6 @@ export interface PluginAPI {
   closePullUp(): void;
   autoPullUpLoad(): void;
 }
-
-export type ScrollConstructor = BScrollConstructor & PluginAPI;
 
 export interface EaseItem {
   style: string;
