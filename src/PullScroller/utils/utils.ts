@@ -11,16 +11,14 @@ export function throttle(fn: (...rest) => void, delay = 300) {
 
 export function debounce(fn: (...rest) => void, delay = 300) {
   let timer;
-
   return function () {
     const args = [...arguments];
-    if (timer) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
       clearTimeout(timer);
-    } else {
-      timer = setTimeout(() => {
-        fn.apply(this, args);
-      }, delay);
-    }
+      timer = null;
+    }, delay);
   };
 }
 

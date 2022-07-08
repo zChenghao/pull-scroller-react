@@ -5,7 +5,7 @@ export function makeElement(maker: ReactNode | PullDownMaker | PullUpMaker | Bac
   if (isValidElement(maker)) return maker;
   if (typeof maker === 'function') {
     try {
-      return maker(props);
+      return maker({ ...props });
     } catch {
       return null;
     }
