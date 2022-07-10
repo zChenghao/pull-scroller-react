@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { debounce, throttle } from '../utils/utils';
+import { calcDistance, debounce, throttle } from '../utils/utils';
 import { ScrollConstructor, ScrollProps } from '../type';
 
 /* ============ 滚动事件相关 ============ */
@@ -9,28 +9,20 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
   const [switchBackTop, setSwitchBackTop] = useState(true);
   const { handleScroll, backTop } = props;
 
-  // 计算 Y轴 滚动距离
-  const calcScrollY = (y: number) => {
-    const dis = y.toString();
-    const scrollY = parseInt(dis, 10);
-    if (scrollY === 0) return scrollY;
-    if (scrollY > 0) return -scrollY;
-    return Math.abs(scrollY);
-  };
-
   // 更新 Y轴 滚动距离
   const updateScrollY = useCallback((y?: number) => {
     if (y === undefined || y === null) return;
-    setScrollY(y);
+    const scrollY = calcDistance(y);
+    setScrollY(scrollY);
+    return scrollY;
   }, []);
 
   // 滚动事件
   const scroll = useCallback(
     (pos) => {
-      const scrollY = calcScrollY(pos.y);
-      updateScrollY(scrollY);
+      const scrollY = updateScrollY(pos.y);
       setSwitchBackTop(false);
-      if (handleScroll) {
+      if (handleScroll && (scrollY || scrollY === 0)) {
         handleScroll(scrollY);
       }
     },
@@ -51,9 +43,8 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
 
     const move = throttle(scroll, 50);
     const scrollEnd = (pos) => {
-      const scrollY = calcScrollY(pos.y);
+      updateScrollY(pos.y);
       setSwitchBackTop(true);
-      updateScrollY(scrollY);
     };
 
     if (hasEvent) {

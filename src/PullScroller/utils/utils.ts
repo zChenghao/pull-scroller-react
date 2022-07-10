@@ -26,3 +26,12 @@ export function debounce(fn: (...rest) => void, delay = 300) {
 export function isAsync(fn: (...rest) => any) {
   return fn.constructor.name === 'AsyncFunction';
 }
+
+// 计算滚动距离
+export function calcDistance(distance: number) {
+  const tmp = distance.toString();
+  const dis = parseInt(tmp, 10);
+  if (dis === 0) return dis;
+  if (dis > 0) return -dis;
+  return Math.abs(dis);
+}
