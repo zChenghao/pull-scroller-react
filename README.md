@@ -251,11 +251,11 @@ function App() {
     }, [])
 
     return (
-       <LoadScroll
+       <PullScroller
         ref={scroller}
       >
         <List list={list} />
-      </LoadScroll>
+      </PullScroller>
     )
   }
 
@@ -285,7 +285,7 @@ There are two recommended ways.
   
   function App(){
      return (
-      <PullScroller height={height: '100vh'}>
+      <PullScroller height={'100vh'}>
         <img className={style['banner-img']} src="imgurl" alt="" />
       </PullScroller>   
     );
@@ -315,7 +315,7 @@ There are two recommended ways.
   
   function App(){
      return (
-      <PullScroller height={height: '100vh'}>
+      <PullScroller height={'100vh'}>
         <div className={style.banner}>
           <img className={style['banner-img']} src="imgurl" alt="" />
         </div>
@@ -331,7 +331,7 @@ There are two recommended ways.
   function App(){
      return (
       <PullScroller
-         height={height: '100vh'}
+         height={'100vh'}
          observeImg={true}
          // or
          // observeImg={{ debounceTime: 100 }}
@@ -350,7 +350,7 @@ Examples:
 ```javascript
   function App(){
      return (
-      <PullScroller height={height: '100vh'}>
+      <PullScroller height={'100vh'}>
           <div calss="wrapper" style={{ width: '100%', height: '200px', overflow: 'scroll' }}>
             <div style={{ width: '100%', height: '500px'}}></div>
           </div>
@@ -383,7 +383,7 @@ You can solve the problem like this:
     }, []);
 
     return (
-      <PullScroller height={height: '100vh'}>
+      <PullScroller height={'100vh'}>
           <div ref={wrapper} calss="wrapper" style={{ width: '100%', height: '200px', overflow: 'scroll' }}>
             <div style={{ width: '100%', height: '500px'}}></div>
           </div>

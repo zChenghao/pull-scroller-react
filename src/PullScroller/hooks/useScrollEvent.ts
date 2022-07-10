@@ -21,16 +21,15 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
   // 更新 Y轴 滚动距离
   const updateScrollY = useCallback((y?: number) => {
     if (y === undefined || y === null) return;
-    const scrollY = calcScrollY(y);
-    setScrollY(scrollY);
+    setScrollY(y);
   }, []);
 
   // 滚动事件
   const scroll = useCallback(
     (pos) => {
-      updateScrollY(pos.y);
-      setSwitchBackTop(false);
       const scrollY = calcScrollY(pos.y);
+      updateScrollY(scrollY);
+      setSwitchBackTop(false);
       if (handleScroll) {
         handleScroll(scrollY);
       }
@@ -52,8 +51,9 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
 
     const move = throttle(scroll, 50);
     const scrollEnd = (pos) => {
+      const scrollY = calcScrollY(pos.y);
       setSwitchBackTop(true);
-      updateScrollY(pos.y);
+      updateScrollY(scrollY);
     };
 
     if (hasEvent) {
