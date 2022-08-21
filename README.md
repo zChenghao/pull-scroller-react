@@ -11,7 +11,13 @@ A H5 mobile scrolling component developed based on React and Better-Scroll suppo
 ## Installation
 
 ```shell
-npm install pull-scroller-react @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up @better-scroll/observe-image
+npm install pull-scroller-react
+```
+
+Install the dependencies related to better-scroll.
+
+```shell
+npm install @better-scroll/core @better-scroll/pull-down @better-scroll/pull-up @better-scroll/observe-image
 ```
 
 **Note: this component needs to run react > 16.8.**

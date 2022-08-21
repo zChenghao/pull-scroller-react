@@ -61,10 +61,10 @@ export function usePullUp(
       setIsPullingUp(true);
 
       try {
-        const judgeAsync = isAsync(pullUpHandler);
-        if (judgeAsync) {
-          console.log('async callback');
-          // pullUpHandler 是 async 函数，函数执行完，自动结束刷新
+        const flag = isAsync(pullUpHandler);
+        if (flag) {
+          // console.log('async callback');
+          // pullUpHandler 是 async 函数，函数执行完，自动结束下拉
           // pullUpHandler 是 async 函数时，handlePullUpLoad 方法不会接受 finish 函数为参数
           const res = await (pullUpHandler as AsyncPullingHandler)();
           if (res) {
@@ -73,32 +73,32 @@ export function usePullUp(
             finish();
           }
         } else {
-          console.log('sync callback');
-          // pullUpHandler 不是 async 函数，函数执行完，方法接受 finish 方法为参数，你需要在自己代码逻辑中手动结束刷新
+          // console.log('sync callback');
+          // pullUpHandler 不是 async 函数，函数执行完，方法接受 finish 方法为参数，在自己代码中接收这个方法，手动结束上拉
           (pullUpHandler as SyncPullingHandler)(finish);
         }
       } catch (e: any) {
         finish({ error: true });
         if (e instanceof Error) throw e;
-        throw new Error(e);
+        throw new Error(JSON.stringify(e));
       }
     }
   }, [finish, pullUpHandler]);
 
   useEffect(() => {
-    const hasEvent = enablePullUp && bScroller && bScroller.eventTypes.pullingUp;
+    const hasEvent = enablePullUp && pullUpHandler !== undefined && bScroller && bScroller.eventTypes.pullingUp;
     if (hasEvent) {
-      console.log('bind pullingUp');
+      // console.log('bind pullingUp');
       bScroller.on('pullingUp', pullingUpHandler);
     }
 
     return () => {
       if (hasEvent) {
-        console.log('off pullingUp');
+        // console.log('off pullingUp');
         bScroller.off('pullingUp', pullingUpHandler);
       }
     };
-  }, [bScroller, enablePullUp, pullingUpHandler]);
+  }, [bScroller, enablePullUp, pullUpHandler, pullingUpHandler]);
 
   return { beforePullUp, isPullingUp, isPullUpError };
 }

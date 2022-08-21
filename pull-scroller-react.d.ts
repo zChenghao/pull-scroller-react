@@ -40,7 +40,7 @@ declare module 'pull-scroller-react' {
   
   export interface ScrollProps {
     readonly height?: string; // Height of scrolling area.The default value is '100%'
-    readonly handleScroll?: (scrollY: number) => void; // custom scroll event
+    readonly handleScroll?: (scrollY?: number) => void; // custom scroll event
     // PullDown
     readonly enablePullDown?: boolean; // enable pulldown (refresh)
     readonly pullDownHandler?: SyncPullingHandler | AsyncPullingHandler; // pullDown handler

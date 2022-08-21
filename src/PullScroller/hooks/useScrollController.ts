@@ -12,7 +12,16 @@ BScroll.use(ObserveImage);
 export function useScrollController(props: ScrollerProps, el: HTMLElement | string, contentHeight = 0) {
   const bscroller = useRef<ScrollConstructor | null | undefined>();
   const [bScroller, setBScroller] = useState<ScrollConstructor>();
-  const { enablePullDown, enablePullUp, observeImg, extraConfig, pullDownConfig, pullUpConfig } = props;
+  const {
+    enablePullDown,
+    enablePullUp,
+    pullDownConfig,
+    pullUpConfig,
+    pullDownHandler,
+    pullUpHandler,
+    observeImg,
+    extraConfig
+  } = props;
   const pullDownCon = useMemo(
     () => (pullDownConfig === true ? pullDownConfig : { threshold: 90, stop: 40, ...pullDownConfig }),
     [pullDownConfig]
@@ -22,7 +31,7 @@ export function useScrollController(props: ScrollerProps, el: HTMLElement | stri
   // 初始化滚动方法
   const initScroller = useCallback(
     (el: string | HTMLElement) => {
-      console.log('init scroll');
+      // console.log('init scroll');
       const extraOpt = extraConfig ?? {};
       const baseConfig = {
         click: true,
@@ -32,14 +41,12 @@ export function useScrollController(props: ScrollerProps, el: HTMLElement | stri
         pullDownRefresh: pullDownCon,
         // 上拉加载
         pullUpLoad: pullUpCon,
-        // eventPassthrough: 'horizontal',
-        // preventDefault: true,
-        // probeType: 0,
         ...extraOpt
       };
       // let conf: typeof baseConfig = { ...baseConfig };
-      if (observeImg) return new BScroll(el, { ...baseConfig, observeImage: observeImg });
-      return new BScroll(el, baseConfig);
+      // if (observeImg) return new BScroll(el, { ...baseConfig, observeImage: observeImg });
+      // return new BScroll(el, baseConfig);
+      return observeImg ? new BScroll(el, { ...baseConfig, observeImage: observeImg }) : new BScroll(el, baseConfig);
     },
     [extraConfig, observeImg, pullDownCon, pullUpCon]
   );
@@ -56,7 +63,7 @@ export function useScrollController(props: ScrollerProps, el: HTMLElement | stri
     // 销毁滚动
     return () => {
       if (bscroller.current) {
-        console.log('destroy');
+        // console.log('destroy');
         bscroller.current.destroy();
       }
     };
@@ -66,32 +73,34 @@ export function useScrollController(props: ScrollerProps, el: HTMLElement | stri
   useEffect(() => {
     if (bscroller.current) {
       bscroller.current.refresh();
-      console.log('refresh bScroller');
+      // console.log('refresh bScroller');
     }
   }, [props.height, contentHeight]);
 
   // 是否开始下拉刷新
   useEffect(() => {
-    if (enablePullDown) {
+    const usePullDown = enablePullDown && pullDownHandler !== undefined;
+    if (usePullDown) {
       bScroller?.openPullDown(pullDownCon);
     } else {
       bScroller?.closePullDown();
     }
     return () => {
-      if (enablePullDown) bScroller?.closePullDown();
+      if (usePullDown) bScroller?.closePullDown();
     };
   }, [bScroller, enablePullDown, pullDownCon]);
 
   // 否开启上拉加载
   useEffect(() => {
-    if (enablePullUp) {
+    const usePullUp = enablePullUp && pullUpHandler !== undefined;
+    if (usePullUp) {
       bScroller?.openPullUp(pullUpCon);
     } else {
       bScroller?.closePullUp();
     }
 
     return () => {
-      if (enablePullUp) bScroller?.closePullUp();
+      if (usePullUp) bScroller?.closePullUp();
     };
   }, [bScroller, enablePullUp, pullUpCon]);
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { calcDistance, debounce, throttle } from '../utils/utils';
 import { ScrollConstructor, ScrollProps } from '../type';
 
@@ -8,6 +8,10 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
   const [scrollY, setScrollY] = useState(0);
   const [switchBackTop, setSwitchBackTop] = useState(true);
   const { handleScroll, backTop } = props;
+
+  // BackTop show or hide
+  const showBack = useMemo(() => switchBackTop && scrollY > 100, [scrollY, switchBackTop]);
+  const showAlways = useMemo(() => scrollY > 100, [scrollY]);
 
   // 更新 Y轴 滚动距离
   const updateScrollY = useCallback((y?: number) => {
@@ -20,11 +24,9 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
   // 滚动事件
   const scroll = useCallback(
     (pos) => {
-      const scrollY = updateScrollY(pos.y);
+      const y = updateScrollY(pos.y);
       setSwitchBackTop(false);
-      if (handleScroll && (scrollY || scrollY === 0)) {
-        handleScroll(scrollY);
-      }
+      if (handleScroll && (y || y === 0)) handleScroll(y);
     },
     [handleScroll, updateScrollY]
   );
@@ -48,18 +50,18 @@ export function useScrollEvent(bScroller: ScrollConstructor | undefined | null, 
     };
 
     if (hasEvent) {
-      console.log('bind scroll');
+      // console.log('bind scroll');
       scroller.on('scroll', move);
       scroller.on('scrollEnd', scrollEnd);
     }
     return () => {
       if (hasEvent) {
-        console.log('off scroll');
+        // console.log('off scroll');
         if (scroller.eventTypes.scroll) scroller.off('scroll', move);
         if (scroller.eventTypes.scrollEnd) scroller.off('scrollEnd', scrollEnd);
       }
     };
   }, [bScroller, backTop, handleScroll, scroll, updateScrollY]);
 
-  return { scrollY, switchBackTop, scrollToTop };
+  return { showBack, showAlways, scrollToTop };
 }

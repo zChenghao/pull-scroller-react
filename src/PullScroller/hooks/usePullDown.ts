@@ -59,9 +59,9 @@ export function usePullDown(
       setBeforePullDown(false);
       setIsPullingDown(true);
       try {
-        const isasync = isAsync(pullDownHandler);
-        if (isasync) {
-          console.log('async callback');
+        const flag = isAsync(pullDownHandler);
+        if (flag) {
+          // console.log('async callback');
           // pullDownHandler 是 async 函数，函数执行完，自动结束刷新
           // pullDownHandler 是 async 函数时，handleRefresh方法不会接受 finish 函数为参数
           const res = await (pullDownHandler as AsyncPullingHandler)();
@@ -71,31 +71,31 @@ export function usePullDown(
             finish();
           }
         } else {
-          console.log('sync callback');
-          // pullDownHandler 不是 async 函数，函数执行完，方法接受 finish方法为参数，你需要在自己代码逻辑中手动结束刷新
+          // console.log('sync callback');
+          // pullDownHandler 是 sync 函数，函数执行完，方法接受 finish方法为参数，在自己代码中接收这个方法，手动结束刷新
           (pullDownHandler as SyncPullingHandler)(finish);
         }
       } catch (e: any) {
         finish({ error: true });
         if (e instanceof Error) throw e;
-        throw new Error(e);
+        throw new Error(JSON.stringify(e));
       }
     }
   }, [finish, pullDownHandler]);
 
   useEffect(() => {
-    const hasEvent = enablePullDown && bScroller && bScroller.eventTypes.pullingDown;
+    const hasEvent = enablePullDown && pullDownHandler !== undefined && bScroller && bScroller.eventTypes.pullingDown;
     if (hasEvent) {
-      console.log('bind pullingDown');
+      // console.log('bind pullingDown');
       bScroller.on('pullingDown', pullingDownHandler);
     }
     return () => {
       if (hasEvent) {
-        console.log('off pullingDown');
+        // console.log('off pullingDown');
         bScroller.off('pullingDown', pullingDownHandler);
       }
     };
-  }, [bScroller, enablePullDown, pullingDownHandler]);
+  }, [bScroller, enablePullDown, pullDownHandler, pullingDownHandler]);
 
   return { beforePullDown, isPullingDown, isPullDownError };
 }

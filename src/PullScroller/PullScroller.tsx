@@ -4,12 +4,13 @@ import { makeElement } from './utils/makeElement';
 import { ScrollerProps, ExposedMethodsRef } from './type';
 
 const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullScroller(props, ref) {
+  const { pullDownLoader, pullUpLoader, backTop } = props;
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const container = useRef<HTMLDivElement | null>(null);
-  const [contentHeight, setContentHeight] = useState<number>();
-  const { pullDownLoader, pullUpLoader, backTop } = props;
+  const [contentHeight, setContentHeight] = useState<number>(0);
+
   const { bScroller } = useScrollController(props, scrollRef.current as HTMLDivElement, contentHeight);
-  const { scrollY, switchBackTop, scrollToTop } = useScrollEvent(bScroller, props);
+  const { showBack, showAlways, scrollToTop } = useScrollEvent(bScroller, props);
   const { beforePullDown, isPullingDown, isPullDownError } = usePullDown(bScroller, props);
   const { beforePullUp, isPullingUp, isPullUpError } = usePullUp(bScroller, props);
   const methods = useExposed(bScroller);
@@ -17,13 +18,10 @@ const PullScroller = forwardRef<ExposedMethodsRef, ScrollerProps>(function PullS
   useImperativeHandle(ref, () => methods, [methods]);
 
   useEffect(() => {
-    // setContentHeight(container.current?.getBoundingClientRect().height);
-    setContentHeight(container.current?.offsetHeight);
+    // const h = container.current?.getBoundingClientRect().height ?? 0;
+    const height = container.current?.offsetHeight ?? 0;
+    setContentHeight(height);
   }, [props.children]);
-
-  // BackTop show or hide
-  const showBack = useMemo(() => switchBackTop && scrollY > 100, [scrollY, switchBackTop]);
-  const showAlways = useMemo(() => scrollY > 100, [scrollY]);
 
   const Refresher = useMemo(() => {
     if (pullDownLoader) return makeElement(pullDownLoader, { beforePullDown, isPullingDown, isPullDownError });
